@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\BelongsToEmpresa;
+
 class Pagamento extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToEmpresa;
 
     protected $table = 'pagamentos';
-    protected $fillable = ['emprestimo_id', 'valor_pago', 'data_pagamento', 'observacoes'];
+    protected $fillable = ['emprestimo_id', 'valor_pago', 'data_pagamento', 'observacoes', 'empresa_id'];
 
     protected $casts = [
         'data_pagamento' => 'date',

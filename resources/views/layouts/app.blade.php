@@ -13,18 +13,43 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('emprestimos.index') }}">Finanças</a>
+            <a class="navbar-brand" href="{{ route('dashboard') }}">Finanças</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav me-auto">
+                    @auth
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('emprestimos.index') }}">Empréstimos</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('clientes.index') }}">Clientes</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('usuarios.index') }}">Usuários</a>
+                    </li>
+                    @endauth
+                </ul>
+                <ul class="navbar-nav">
+                    @auth
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('empresa.edit') }}">Minha Empresa </a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-link nav-link">Sair ({{ Auth::user()->name }})</button>
+                        </form>
+                    </li>
+                    @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('login') }}">Entrar</a>
+                    </li>
+                    @endauth
                 </ul>
             </div>
         </div>
