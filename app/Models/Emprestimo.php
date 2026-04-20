@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\BelongsToEmpresa;
+
 class Emprestimo extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToEmpresa;
 
     protected $table = 'emprestimos';
     protected $fillable = [
         'cliente_id', 'valor', 'taxa_juros', 'valor_total',
-        'frequencia_pagamento', 'data_vencimento', 'status'
+        'frequencia_pagamento', 'data_vencimento', 'status', 'empresa_id'
     ];
 
     protected $casts = [

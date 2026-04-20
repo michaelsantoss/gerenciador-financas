@@ -21,7 +21,24 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'empresa_id',
+        'role_id',
     ];
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class, 'empresa_id');
+    }
+
+    public function temPermissao($permissaoSlug)
+    {
+        return $this->role && $this->role->permissions()->where('slug', $permissaoSlug)->exists();
+    }
 
     /**
      * The attributes that should be hidden for serialization.
