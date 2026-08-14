@@ -35,12 +35,14 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('dashboard') }}">Finanças</a>
-            @auth
-            <button type="button" id="btn-privacidade" class="btn btn-link nav-link text-white me-2 order-lg-2" title="Mostrar/ocultar nomes e valores">
-                <span id="icone-privacidade">👁️</span>
-            </button>
-            @endauth
+            <div class="d-flex align-items-center">
+                <a class="navbar-brand mb-0" href="{{ route('dashboard') }}">Finanças</a>
+                @auth
+                <button type="button" id="btn-privacidade" class="btn btn-link nav-link text-white ms-3 p-0" title="Mostrar/ocultar nomes e valores">
+                    <span id="icone-privacidade" style="font-size: 1.25rem;">👀</span>
+                </button>
+                @endauth
+            </div>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -114,7 +116,7 @@
             const iconePrivacidade = document.getElementById('icone-privacidade');
 
             function atualizarIcone() {
-                iconePrivacidade.textContent = document.documentElement.classList.contains('privacidade-ativa') ? '🙈' : '👁️';
+                iconePrivacidade.textContent = document.documentElement.classList.contains('privacidade-ativa') ? '🙈' : '👀';
             }
 
             atualizarIcone();
