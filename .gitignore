@@ -8,6 +8,8 @@
 .env.backup
 .env.production
 SERVIDOR.md
+PUBLICAR.md
+GUIA.md
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
