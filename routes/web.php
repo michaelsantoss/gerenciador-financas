@@ -6,6 +6,7 @@ use App\Http\Controllers\EmprestimoWebController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\PushSubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,4 +44,7 @@ Route::middleware(['auth', 'empresa'])->group(function () {
     
     // Ações de Parcelas
     Route::post('parcelas/{parcela}/quitar', [EmprestimoWebController::class, 'quitarParcela'])->name('parcelas.quitar');
+
+    // Notificações Push
+    Route::post('push/subscribe', [PushSubscriptionController::class, 'store'])->name('push.subscribe');
 });

@@ -13,6 +13,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finanças">
+    @auth
+    <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}">
+    @endauth
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -47,6 +50,9 @@
                 <ul class="navbar-nav">
                     @auth
                     <li class="nav-item">
+                        <button type="button" id="btn-ativar-notificacoes" class="btn btn-link nav-link">Ativar notificações</button>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('empresa.edit') }}">Minha Empresa </a>
                     </li>
                     <li class="nav-item">
@@ -78,8 +84,49 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+        }
+
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
+        }
+
+        const btnAtivarNotificacoes = document.getElementById('btn-ativar-notificacoes');
+        if (btnAtivarNotificacoes) {
+            btnAtivarNotificacoes.addEventListener('click', async () => {
+                try {
+                    const permissao = await Notification.requestPermission();
+                    if (permissao !== 'granted') {
+                        alert('Permissão de notificação negada.');
+                        return;
+                    }
+
+                    const vapidPublicKey = document.querySelector('meta[name="vapid-public-key"]').content;
+                    const registration = await navigator.serviceWorker.ready;
+                    const subscription = await registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+                    });
+
+                    await fetch('{{ route('push.subscribe') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        body: JSON.stringify(subscription),
+                    });
+
+                    alert('Notificações ativadas!');
+                } catch (erro) {
+                    console.error(erro);
+                    alert('Não foi possível ativar as notificações.');
+                }
+            });
         }
     </script>
 </body>

@@ -50,12 +50,34 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Frequência de Pagamento</label>
-                        <select name="frequencia_pagamento" class="form-select">
-                            <option value="mensal" {{ old('frequencia_pagamento') == 'mensal' ? 'selected' : '' }}>Mensal (1 Parcela)</option>
-                            <option value="semanal" {{ old('frequencia_pagamento') == 'semanal' ? 'selected' : '' }}>Semanal (4 Parcelas)</option>
-                        </select>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Frequência de Pagamento</label>
+                            <select id="frequencia_pagamento" name="frequencia_pagamento" class="form-select">
+                                <option value="mensal" {{ old('frequencia_pagamento') == 'mensal' ? 'selected' : '' }}>Mensal (1 Parcela)</option>
+                                <option value="semanal" {{ old('frequencia_pagamento') == 'semanal' ? 'selected' : '' }}>Semanal (N Parcelas)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3 d-none" id="grupo-numero-parcelas">
+                            <label class="form-label">Número de Parcelas</label>
+                            <input type="number" id="numero_parcelas" name="numero_parcelas" class="form-control" min="1" max="52" value="{{ old('numero_parcelas', 4) }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3 d-none" id="grupo-parcelas">
+                        <label class="form-label">Parcelas</label>
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Vencimento</th>
+                                    <th>Valor (R$)</th>
+                                    <th class="text-center">Já pago?</th>
+                                    <th>Data do pagamento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-parcelas"></tbody>
+                        </table>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-recalcular-parcelas">Recalcular parcelas</button>
                     </div>
 
                     <div class="d-grid gap-2">
@@ -96,4 +118,70 @@
         </div>
     </div>
 </div>
+
+<script>
+(function () {
+    const frequencia = document.getElementById('frequencia_pagamento');
+    const grupoNumeroParcelas = document.getElementById('grupo-numero-parcelas');
+    const grupoParcelas = document.getElementById('grupo-parcelas');
+    const numeroParcelas = document.getElementById('numero_parcelas');
+    const valorInput = document.querySelector('input[name="valor"]');
+    const tabela = document.getElementById('tabela-parcelas');
+    const btnRecalcular = document.getElementById('btn-recalcular-parcelas');
+
+    function formatarData(data) {
+        return data.toISOString().slice(0, 10);
+    }
+
+    function gerarLinhas() {
+        const quantidade = Math.max(1, parseInt(numeroParcelas.value || '1', 10));
+        const valorTotal = parseFloat((valorInput.value || '0').replace(',', '.')) || 0;
+        const valorParcela = quantidade > 0 ? (valorTotal / quantidade) : 0;
+        const hoje = new Date();
+
+        tabela.innerHTML = '';
+
+        for (let i = 1; i <= quantidade; i++) {
+            const venc = new Date(hoje);
+            venc.setDate(venc.getDate() + (7 * i));
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="date" class="form-control form-control-sm" name="parcelas[${i}][data_vencimento]" value="${formatarData(venc)}"></td>
+                <td><input type="text" class="form-control form-control-sm" name="parcelas[${i}][valor]" value="${valorParcela.toFixed(2).replace('.', ',')}"></td>
+                <td class="text-center"><input type="checkbox" class="form-check-input parcela-pago" name="parcelas[${i}][pago]" value="1"></td>
+                <td><input type="date" class="form-control form-control-sm parcela-data-pagamento" name="parcelas[${i}][data_pagamento]" value="${formatarData(venc)}" disabled></td>
+            `;
+            tabela.appendChild(tr);
+        }
+    }
+
+    tabela.addEventListener('change', function (event) {
+        if (event.target.classList.contains('parcela-pago')) {
+            const row = event.target.closest('tr');
+            row.querySelector('.parcela-data-pagamento').disabled = !event.target.checked;
+        }
+    });
+
+    frequencia.addEventListener('change', function () {
+        const semanal = frequencia.value === 'semanal';
+        grupoNumeroParcelas.classList.toggle('d-none', !semanal);
+        grupoParcelas.classList.toggle('d-none', !semanal);
+        if (semanal) {
+            gerarLinhas();
+        } else {
+            tabela.innerHTML = '';
+        }
+    });
+
+    numeroParcelas.addEventListener('change', gerarLinhas);
+    btnRecalcular.addEventListener('click', gerarLinhas);
+
+    if (frequencia.value === 'semanal') {
+        grupoNumeroParcelas.classList.remove('d-none');
+        grupoParcelas.classList.remove('d-none');
+        gerarLinhas();
+    }
+})();
+</script>
 @endsection

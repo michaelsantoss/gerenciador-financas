@@ -10,9 +10,16 @@ class EmprestimoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        $parcelas = collect($this->parcelas ?? [])->map(function ($parcela) {
+            $parcela['valor'] = str_replace(',', '.', $parcela['valor'] ?? '');
+            $parcela['pago'] = filter_var($parcela['pago'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            return $parcela;
+        })->all();
+
         $this->merge([
             'valor' => str_replace(',', '.', $this->valor),
             'taxa_juros' => str_replace(',', '.', $this->taxa_juros),
+            'parcelas' => $parcelas,
         ]);
     }
 
@@ -23,6 +30,12 @@ class EmprestimoRequest extends FormRequest
             'valor' => 'required|numeric|min:0.01',
             'taxa_juros' => 'nullable|numeric|min:0',
             'frequencia_pagamento' => 'required|in:semanal,mensal',
+            'numero_parcelas' => 'required_if:frequencia_pagamento,semanal|integer|min:1|max:52',
+            'parcelas' => 'nullable|array',
+            'parcelas.*.valor' => 'required_with:parcelas|numeric|min:0.01',
+            'parcelas.*.data_vencimento' => 'required_with:parcelas|date',
+            'parcelas.*.pago' => 'nullable|boolean',
+            'parcelas.*.data_pagamento' => 'nullable|date',
         ];
     }
 }
