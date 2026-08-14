@@ -8,7 +8,7 @@
         <div class="card bg-primary text-white shadow-sm mb-4">
             <div class="card-body">
                 <h6>Total Emprestado</h6>
-                <h3>R$ {{ number_format($totalEmprestado, 2, ',', '.') }}</h3>
+                <h3 class="dado-sensivel">R$ {{ number_format($totalEmprestado, 2, ',', '.') }}</h3>
             </div>
         </div>
     </div>
@@ -16,7 +16,7 @@
         <div class="card bg-success text-white shadow-sm mb-4">
             <div class="card-body">
                 <h6>Total a Receber</h6>
-                <h3>R$ {{ number_format($totalReceber, 2, ',', '.') }}</h3>
+                <h3 class="dado-sensivel">R$ {{ number_format($totalReceber, 2, ',', '.') }}</h3>
             </div>
         </div>
     </div>

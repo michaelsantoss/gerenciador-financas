@@ -23,8 +23,8 @@
                 <tbody>
                     @foreach($clientes as $cliente)
                     <tr>
-                        <td>{{ $cliente->nome }}</td>
-                        <td>{{ $cliente->telefone ?? 'Não informado' }}</td>
+                        <td class="dado-sensivel">{{ $cliente->nome }}</td>
+                        <td class="dado-sensivel">{{ $cliente->telefone ?? 'Não informado' }}</td>
                         <td>{{ $cliente->emprestimos->where('status', 'ativo')->count() }}</td>
                         <td>
                             <a href="{{ route('clientes.show', $cliente->id) }}" class="btn btn-sm btn-outline-secondary">Ver Histórico</a>

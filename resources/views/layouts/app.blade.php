@@ -21,12 +21,26 @@
     <style>
         body { background-color: #f8f9fa; }
         .navbar { margin-bottom: 2rem; }
+        .privacidade-ativa .dado-sensivel {
+            filter: blur(6px);
+            user-select: none;
+        }
     </style>
+    <script>
+        if (localStorage.getItem('privacidadeAtiva') === '1') {
+            document.documentElement.classList.add('privacidade-ativa');
+        }
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="{{ route('dashboard') }}">Finanças</a>
+            @auth
+            <button type="button" id="btn-privacidade" class="btn btn-link nav-link text-white me-2 order-lg-2" title="Mostrar/ocultar nomes e valores">
+                <span id="icone-privacidade">👁️</span>
+            </button>
+            @endauth
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -93,6 +107,23 @@
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
+        }
+
+        const btnPrivacidade = document.getElementById('btn-privacidade');
+        if (btnPrivacidade) {
+            const iconePrivacidade = document.getElementById('icone-privacidade');
+
+            function atualizarIcone() {
+                iconePrivacidade.textContent = document.documentElement.classList.contains('privacidade-ativa') ? '🙈' : '👁️';
+            }
+
+            atualizarIcone();
+
+            btnPrivacidade.addEventListener('click', () => {
+                const ativo = document.documentElement.classList.toggle('privacidade-ativa');
+                localStorage.setItem('privacidadeAtiva', ativo ? '1' : '0');
+                atualizarIcone();
+            });
         }
 
         const btnAtivarNotificacoes = document.getElementById('btn-ativar-notificacoes');

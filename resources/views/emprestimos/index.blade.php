@@ -33,9 +33,9 @@
                 <tbody>
                     @foreach($emprestimos as $emprestimo)
                     <tr class="{{ $emprestimo->status == 'atrasado' ? 'table-danger' : '' }}">
-                        <td>{{ $emprestimo->cliente->nome }}</td>
-                        <td>R$ {{ number_format($emprestimo->valor, 2, ',', '.') }}</td>
-                        <td>R$ {{ number_format($emprestimo->valor_total, 2, ',', '.') }}</td>
+                        <td class="dado-sensivel">{{ $emprestimo->cliente->nome }}</td>
+                        <td class="dado-sensivel">R$ {{ number_format($emprestimo->valor, 2, ',', '.') }}</td>
+                        <td class="dado-sensivel">R$ {{ number_format($emprestimo->valor_total, 2, ',', '.') }}</td>
                         <td class="{{ $emprestimo->data_vencimento->isPast() && $emprestimo->status != 'pago' ? 'text-danger fw-bold' : '' }}">
                             {{ $emprestimo->data_vencimento->format('d/m/Y') }}
                         </td>

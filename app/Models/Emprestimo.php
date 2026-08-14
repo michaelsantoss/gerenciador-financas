@@ -45,8 +45,10 @@ class Emprestimo extends Model
     {
         if ($this->saldo <= 0) {
             $this->update(['status' => 'pago']);
-        } elseif ($this->data_vencimento->isPast() && $this->status !== 'pago') {
+        } elseif ($this->data_vencimento->isPast()) {
             $this->update(['status' => 'atrasado']);
+        } else {
+            $this->update(['status' => 'ativo']);
         }
     }
 }

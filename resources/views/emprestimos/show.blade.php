@@ -15,9 +15,9 @@
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-white">Resumo do Empréstimo</div>
             <div class="card-body">
-                <p><strong>Cliente:</strong> {{ $emprestimo->cliente->nome }}</p>
-                <p><strong>Total Devido:</strong> R$ {{ number_format($emprestimo->valor_total, 2, ',', '.') }}</p>
-                <p><strong>Saldo Restante:</strong> R$ {{ number_format($emprestimo->saldo, 2, ',', '.') }}</p>
+                <p><strong>Cliente:</strong> <span class="dado-sensivel">{{ $emprestimo->cliente->nome }}</span></p>
+                <p><strong>Total Devido:</strong> <span class="dado-sensivel">R$ {{ number_format($emprestimo->valor_total, 2, ',', '.') }}</span></p>
+                <p><strong>Saldo Restante:</strong> <span class="dado-sensivel">R$ {{ number_format($emprestimo->saldo, 2, ',', '.') }}</span></p>
                 <p><strong>Status:</strong> <span class="badge bg-primary">{{ ucfirst($emprestimo->status) }}</span></p>
             </div>
         </div>
@@ -44,7 +44,7 @@
                             <td class="{{ $parcela->status == 'pendente' && $parcela->data_vencimento->isPast() ? 'text-danger fw-bold' : '' }}">
                                 {{ $parcela->data_vencimento->format('d/m/Y') }}
                             </td>
-                            <td>R$ {{ number_format($parcela->valor, 2, ',', '.') }}</td>
+                            <td class="dado-sensivel">R$ {{ number_format($parcela->valor, 2, ',', '.') }}</td>
                             <td>
                                 <span class="badge bg-{{ $parcela->status == 'pago' ? 'success' : 'warning' }}">
                                     {{ ucfirst($parcela->status) }}
