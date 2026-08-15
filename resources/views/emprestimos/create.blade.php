@@ -4,7 +4,8 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-sm">
-            <div class="card-header bg-white">
+            <div class="card-header bg-white d-flex align-items-center gap-2">
+                @include('partials.back-button', ['href' => route('emprestimos.index')])
                 <h4 class="mb-0">Novo Empréstimo</h4>
             </div>
             <div class="card-body">

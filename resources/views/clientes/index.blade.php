@@ -22,7 +22,7 @@
                 </thead>
                 <tbody>
                     @foreach($clientes as $cliente)
-                    <tr>
+                    <tr class="linha-clicavel" data-href="{{ route('clientes.show', $cliente->id) }}">
                         <td class="dado-sensivel">{{ $cliente->nome }}</td>
                         <td class="dado-sensivel">{{ $cliente->telefone ?? 'Não informado' }}</td>
                         <td>{{ $cliente->emprestimos->where('status', 'ativo')->count() }}</td>

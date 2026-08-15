@@ -4,9 +4,9 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card shadow-sm">
-            <div class="card-header bg-white d-flex justify-content-between">
+            <div class="card-header bg-white d-flex align-items-center gap-2">
+                @include('partials.back-button', ['href' => route('usuarios.index')])
                 <h4 class="mb-0">Editar Usuário</h4>
-                <a href="{{ route('usuarios.index') }}" class="btn btn-sm btn-outline-secondary">Voltar</a>
             </div>
             <div class="card-body">
                 <form action="{{ route('usuarios.update', $usuario->id) }}" method="POST">

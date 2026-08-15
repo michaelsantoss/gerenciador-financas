@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+<div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+    @include('partials.back-button', ['href' => route('clientes.index')])
     <h1 class="mb-0">Detalhes do Cliente: <span class="dado-sensivel">{{ $cliente->nome }}</span></h1>
-    <a href="{{ route('clientes.index') }}" class="btn btn-outline-secondary">Voltar</a>
 </div>
 
 <div class="row">

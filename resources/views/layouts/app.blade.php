@@ -20,7 +20,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f8f9fa; }
-        .navbar { margin-bottom: 2rem; }
         .privacidade-ativa .dado-sensivel {
             filter: blur(6px);
             user-select: none;
@@ -28,6 +27,61 @@
 
         /* Ações de parcela (pagar/desfazer): lado a lado no desktop, empilhado no mobile */
         .parcela-acao-form .parcela-acao-valor { width: 110px; }
+
+        /* Linha de tabela clicável (navega pro detalhe, exceto botões/links/forms internos) */
+        tr.linha-clicavel { cursor: pointer; }
+        tr.linha-clicavel:hover { background-color: rgba(13, 110, 253, 0.06); }
+
+        /* Botão circular de voltar, usado nos cabeçalhos das telas de detalhe/formulário */
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            color: #0f172a;
+        }
+        .btn-voltar:hover { background: #e9ecef; color: #0f172a; }
+
+        /* Menu superior */
+        .app-navbar {
+            background: linear-gradient(135deg, #0f172a, #1d4ed8);
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        .app-navbar .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        .app-navbar-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 1.1rem;
+            padding: 0;
+        }
+        .app-navbar-icon-btn:hover { background: rgba(255, 255, 255, 0.18); }
+        .app-navbar .navbar-nav .nav-link {
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            margin: 0.1rem 0.15rem;
+        }
+        .app-navbar .navbar-nav .nav-link:hover { background-color: rgba(255, 255, 255, 0.08); }
+        .app-navbar .navbar-nav .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.16);
+            font-weight: 600;
+        }
+        .app-navbar .dropdown-menu { border: none; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); }
 
         @media (max-width: 576px) {
             /* Alvo de toque maior em botões pequenos, sem afetar o desktop */
@@ -52,49 +106,59 @@
     </script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <div class="d-flex align-items-center">
-                <a class="navbar-brand mb-0" href="{{ route('dashboard') }}">Finanças</a>
+    <nav class="navbar navbar-expand-lg navbar-dark app-navbar">
+        <div class="container-fluid container-md">
+            <a class="navbar-brand mb-0 d-flex align-items-center gap-2" href="{{ route('dashboard') }}">
+                <span>💰</span> Finanças
+            </a>
+
+            <div class="d-flex align-items-center gap-1">
                 @auth
-                <button type="button" id="btn-privacidade" class="btn btn-link nav-link text-white ms-3 p-0" title="Mostrar/ocultar nomes e valores">
-                    <span id="icone-privacidade" style="font-size: 1.25rem;">👀</span>
+                <button type="button" id="btn-privacidade" class="app-navbar-icon-btn" title="Mostrar/ocultar nomes e valores">
+                    <span id="icone-privacidade">👀</span>
+                </button>
+                <button type="button" id="btn-ativar-notificacoes" class="app-navbar-icon-btn" title="Ativar notificações">
+                    🔔
                 </button>
                 @endauth
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
             </div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     @auth
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
+                        <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('emprestimos.index') }}">Empréstimos</a>
+                        <a class="nav-link {{ request()->routeIs('emprestimos.*') ? 'active' : '' }}" href="{{ route('emprestimos.index') }}">Empréstimos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('clientes.index') }}">Clientes</a>
+                        <a class="nav-link {{ request()->routeIs('clientes.*') ? 'active' : '' }}" href="{{ route('clientes.index') }}">Clientes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('usuarios.index') }}">Usuários</a>
+                        <a class="nav-link {{ request()->routeIs('usuarios.*') ? 'active' : '' }}" href="{{ route('usuarios.index') }}">Usuários</a>
                     </li>
                     @endauth
                 </ul>
                 <ul class="navbar-nav">
                     @auth
-                    <li class="nav-item">
-                        <button type="button" id="btn-ativar-notificacoes" class="btn btn-link nav-link">Ativar notificações</button>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('empresa.edit') }}">Minha Empresa </a>
-                    </li>
-                    <li class="nav-item">
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-link nav-link">Sair ({{ Auth::user()->name }})</button>
-                        </form>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ request()->routeIs('empresa.edit') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown">
+                            {{ Auth::user()->name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ route('empresa.edit') }}">Minha Empresa</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">Sair</button>
+                                </form>
+                            </li>
+                        </ul>
                     </li>
                     @else
                     <li class="nav-item">
@@ -155,6 +219,15 @@
                 atualizarIcone();
             });
         }
+
+        document.querySelectorAll('tr.linha-clicavel').forEach((linha) => {
+            linha.addEventListener('click', (event) => {
+                if (event.target.closest('a, button, form, input, select, textarea')) {
+                    return;
+                }
+                window.location.href = linha.dataset.href;
+            });
+        });
 
         const btnAtivarNotificacoes = document.getElementById('btn-ativar-notificacoes');
         if (btnAtivarNotificacoes) {

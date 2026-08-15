@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-    <h1 class="mb-0">Detalhes do Empréstimo</h1>
+    <div class="d-flex align-items-center gap-2">
+        @include('partials.back-button', ['href' => route('emprestimos.index')])
+        <h1 class="mb-0">Detalhes do Empréstimo</h1>
+    </div>
     <form action="{{ route('emprestimos.destroy', $emprestimo->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este empréstimo?')">
         @csrf
         @method('DELETE')

@@ -4,7 +4,10 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card shadow-sm">
-            <div class="card-header bg-white"><h4>Novo Usuário</h4></div>
+            <div class="card-header bg-white d-flex align-items-center gap-2">
+                @include('partials.back-button', ['href' => route('usuarios.index')])
+                <h4 class="mb-0">Novo Usuário</h4>
+            </div>
             <div class="card-body">
                 <form action="{{ route('usuarios.store') }}" method="POST">
                     @csrf

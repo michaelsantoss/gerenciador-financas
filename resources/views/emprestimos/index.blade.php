@@ -32,7 +32,7 @@
                 </thead>
                 <tbody>
                     @foreach($emprestimos as $emprestimo)
-                    <tr class="{{ $emprestimo->status == 'atrasado' ? 'table-danger' : '' }}">
+                    <tr class="linha-clicavel {{ $emprestimo->status == 'atrasado' ? 'table-danger' : '' }}" data-href="{{ route('emprestimos.show', $emprestimo->id) }}">
                         <td class="dado-sensivel">{{ $emprestimo->cliente->nome }}</td>
                         <td class="dado-sensivel">R$ {{ number_format($emprestimo->valor, 2, ',', '.') }}</td>
                         <td class="dado-sensivel">R$ {{ number_format($emprestimo->valor_total, 2, ',', '.') }}</td>
