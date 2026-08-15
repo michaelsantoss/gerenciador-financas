@@ -44,6 +44,7 @@ Route::middleware(['auth', 'empresa'])->group(function () {
     
     // Ações de Parcelas
     Route::post('parcelas/{parcela}/quitar', [EmprestimoWebController::class, 'quitarParcela'])->name('parcelas.quitar');
+    Route::post('parcelas/{parcela}/desfazer', [EmprestimoWebController::class, 'desfazerParcela'])->name('parcelas.desfazer');
 
     // Notificações Push
     Route::post('push/subscribe', [PushSubscriptionController::class, 'store'])->name('push.subscribe');

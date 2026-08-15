@@ -44,23 +44,42 @@
                             <td class="{{ $parcela->status == 'pendente' && $parcela->data_vencimento->isPast() ? 'text-danger fw-bold' : '' }}">
                                 {{ $parcela->data_vencimento->format('d/m/Y') }}
                             </td>
-                            <td class="dado-sensivel">R$ {{ number_format($parcela->valor, 2, ',', '.') }}</td>
+                            <td class="dado-sensivel">
+                                R$ {{ number_format($parcela->valor, 2, ',', '.') }}
+                                @if($parcela->valor_pago > 0 && $parcela->status != 'pago')
+                                    <br><small class="text-muted">Pago: R$ {{ number_format($parcela->valor_pago, 2, ',', '.') }} · Falta: R$ {{ number_format($parcela->valor_pendente, 2, ',', '.') }}</small>
+                                @endif
+                            </td>
                             <td>
-                                <span class="badge bg-{{ $parcela->status == 'pago' ? 'success' : 'warning' }}">
+                                <span class="badge bg-{{ $parcela->status == 'pago' ? 'success' : ($parcela->status == 'parcial' ? 'info' : 'warning') }}">
                                     {{ ucfirst($parcela->status) }}
                                 </span>
                             </td>
                             <td>
                                 @if($parcela->status != 'pago')
-                                <form action="{{ route('parcelas.quitar', $parcela->id) }}" method="POST">
+                                <form action="{{ route('parcelas.quitar', $parcela->id) }}" method="POST" class="d-flex gap-1">
                                     @csrf
-                                    <button type="submit" class="btn btn-sm btn-success">Quitar</button>
+                                    <input type="number" name="valor" step="0.01" min="0.01" max="{{ $parcela->valor_pendente }}" value="{{ $parcela->valor_pendente }}" class="form-control form-control-sm" style="width: 110px" title="Valor a pagar">
+                                    <button type="submit" class="btn btn-sm btn-success">Registrar pagamento</button>
                                 </form>
                                 @else
-                                    -
+                                <form action="{{ route('parcelas.desfazer', $parcela->id) }}" method="POST" onsubmit="return confirm('Desfazer o último pagamento desta parcela?')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Desfazer</button>
+                                </form>
                                 @endif
                             </td>
                         </tr>
+                        @if($parcela->status == 'parcial')
+                        <tr>
+                            <td colspan="5" class="text-end pt-0 pb-2">
+                                <form action="{{ route('parcelas.desfazer', $parcela->id) }}" method="POST" onsubmit="return confirm('Desfazer o último pagamento desta parcela?')" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Desfazer último pagamento</button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endif
                         @endforeach
                     </tbody>
                 </table>

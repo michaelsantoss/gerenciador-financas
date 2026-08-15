@@ -12,7 +12,7 @@ class Pagamento extends Model
     use HasFactory, BelongsToEmpresa;
 
     protected $table = 'pagamentos';
-    protected $fillable = ['emprestimo_id', 'valor_pago', 'data_pagamento', 'observacoes', 'empresa_id'];
+    protected $fillable = ['emprestimo_id', 'parcela_id', 'valor_pago', 'data_pagamento', 'observacoes', 'empresa_id'];
 
     protected $casts = [
         'data_pagamento' => 'date',
@@ -21,6 +21,11 @@ class Pagamento extends Model
     public function emprestimo()
     {
         return $this->belongsTo(Emprestimo::class, 'emprestimo_id');
+    }
+
+    public function parcela()
+    {
+        return $this->belongsTo(Parcela::class, 'parcela_id');
     }
 
     protected static function booted()

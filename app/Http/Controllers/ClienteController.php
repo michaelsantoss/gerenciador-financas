@@ -28,7 +28,7 @@ class ClienteController extends Controller
 
     public function show(Cliente $cliente)
     {
-        $cliente->load('emprestimos');
+        $cliente->load('emprestimos.pagamentos');
         // Você pode criar uma view específica depois, por enquanto redireciona ou mostra JSON
         return view('clientes.show', compact('cliente'));
     }

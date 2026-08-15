@@ -9,6 +9,7 @@ use NotificationChannels\WebPush\WebPushMessage;
 class ParcelaVencendoNotification extends Notification
 {
     public function __construct(
+        private string $nomeCliente,
         private int $vencendoHoje,
         private int $atrasadas,
         private float $totalVencendoHoje,
@@ -36,7 +37,7 @@ class ParcelaVencendoNotification extends Notification
         return (new WebPushMessage())
             ->title('Gerenciador de Finanças')
             ->icon('/icons/favicon-180.png')
-            ->body(implode(' | ', $partes))
+            ->body("{$this->nomeCliente} - " . implode(' | ', $partes))
             ->data(['url' => url('/emprestimos')])
             ->options(['TTL' => 3600]);
     }

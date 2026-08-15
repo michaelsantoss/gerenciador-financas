@@ -95,6 +95,15 @@
             </div>
         @endif
 
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @foreach($errors->all() as $error)
+                    {{ $error }}<br>
+                @endforeach
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
         @yield('content')
     </div>
 

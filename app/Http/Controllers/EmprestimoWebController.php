@@ -45,10 +45,26 @@ class EmprestimoWebController extends Controller
         return view('emprestimos.show', compact('emprestimo'));
     }
 
-    public function quitarParcela(Parcela $parcela)
+    public function quitarParcela(Request $request, Parcela $parcela)
     {
-        app(ParcelaController::class)->quitar($parcela);
-        return back()->with('success', 'Parcela quitada com sucesso!');
+        $resultado = app(ParcelaController::class)->quitar($request, $parcela);
+
+        if ($resultado instanceof \Illuminate\Http\JsonResponse) {
+            return back()->withErrors(['error' => $resultado->getData()->message]);
+        }
+
+        return back()->with('success', $resultado->status === 'pago' ? 'Parcela quitada com sucesso!' : 'Pagamento parcial registrado com sucesso!');
+    }
+
+    public function desfazerParcela(Parcela $parcela)
+    {
+        $resultado = app(ParcelaController::class)->desfazer($parcela);
+
+        if ($resultado instanceof \Illuminate\Http\JsonResponse) {
+            return back()->withErrors(['error' => $resultado->getData()->message]);
+        }
+
+        return back()->with('success', 'Pagamento desfeito com sucesso!');
     }
 
     public function destroy(Emprestimo $emprestimo)

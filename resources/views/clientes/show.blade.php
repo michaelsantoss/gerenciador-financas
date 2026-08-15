@@ -27,7 +27,7 @@
                         <tr>
                             <th>Data</th>
                             <th>Valor</th>
-                            <th>Total Devido</th>
+                            <th>Saldo Devedor</th>
                             <th>Status</th>
                             <th>Ações</th>
                         </tr>
@@ -37,7 +37,7 @@
                         <tr>
                             <td>{{ $emprestimo->created_at->format('d/m/Y') }}</td>
                             <td class="dado-sensivel">R$ {{ number_format($emprestimo->valor, 2, ',', '.') }}</td>
-                            <td class="dado-sensivel">R$ {{ number_format($emprestimo->valor_total, 2, ',', '.') }}</td>
+                            <td class="dado-sensivel">R$ {{ number_format($emprestimo->saldo, 2, ',', '.') }}</td>
                             <td>
                                 <span class="badge bg-{{ $emprestimo->status == 'pago' ? 'success' : 'primary' }}">
                                     {{ ucfirst($emprestimo->status) }}

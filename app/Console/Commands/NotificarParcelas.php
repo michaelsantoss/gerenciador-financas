@@ -35,25 +35,54 @@ class NotificarParcelas extends Command
                 ->where('empresa_id', $empresa->id)
                 ->where('status', 'pendente')
                 ->whereDate('data_vencimento', $hoje)
+                ->with('emprestimo.cliente')
                 ->get();
 
             $atrasadas = Parcela::withoutGlobalScopes()
                 ->where('empresa_id', $empresa->id)
                 ->where('status', 'atrasado')
+                ->with('emprestimo.cliente')
                 ->get();
 
             if ($vencendoHoje->isEmpty() && $atrasadas->isEmpty()) {
                 return;
             }
 
-            $notificacao = new ParcelaVencendoNotification(
-                $vencendoHoje->count(),
-                $atrasadas->count(),
-                (float) $vencendoHoje->sum('valor'),
-                (float) $atrasadas->sum('valor')
-            );
+            $porCliente = [];
 
-            $empresa->usuarios()->each(fn ($usuario) => $usuario->notify($notificacao));
+            foreach ($vencendoHoje as $parcela) {
+                $cliente = $parcela->emprestimo?->cliente;
+                if (! $cliente) {
+                    continue;
+                }
+                $porCliente[$cliente->id]['cliente'] = $cliente;
+                $porCliente[$cliente->id]['vencendoHoje'] = ($porCliente[$cliente->id]['vencendoHoje'] ?? 0) + 1;
+                $porCliente[$cliente->id]['totalVencendoHoje'] = ($porCliente[$cliente->id]['totalVencendoHoje'] ?? 0) + (float) $parcela->valor;
+            }
+
+            foreach ($atrasadas as $parcela) {
+                $cliente = $parcela->emprestimo?->cliente;
+                if (! $cliente) {
+                    continue;
+                }
+                $porCliente[$cliente->id]['cliente'] = $cliente;
+                $porCliente[$cliente->id]['atrasadas'] = ($porCliente[$cliente->id]['atrasadas'] ?? 0) + 1;
+                $porCliente[$cliente->id]['totalAtrasado'] = ($porCliente[$cliente->id]['totalAtrasado'] ?? 0) + (float) $parcela->valor;
+            }
+
+            $usuarios = $empresa->usuarios;
+
+            foreach ($porCliente as $dados) {
+                $notificacao = new ParcelaVencendoNotification(
+                    $dados['cliente']->nome,
+                    $dados['vencendoHoje'] ?? 0,
+                    $dados['atrasadas'] ?? 0,
+                    (float) ($dados['totalVencendoHoje'] ?? 0),
+                    (float) ($dados['totalAtrasado'] ?? 0)
+                );
+
+                $usuarios->each(fn ($usuario) => $usuario->notify($notificacao));
+            }
         });
 
         $this->info('Notificações enviadas.');
