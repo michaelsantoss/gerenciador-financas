@@ -29,12 +29,14 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-danger text-white shadow-sm mb-4">
-            <div class="card-body">
-                <h6>Empréstimos em Atraso</h6>
-                <h3>{{ $qtdEmprestimosAtrasados }}</h3>
+        <a href="{{ route('parcelas.hoje') }}" class="text-decoration-none">
+            <div class="card bg-danger text-white shadow-sm mb-4">
+                <div class="card-body">
+                    <h6>Empréstimos em Atraso</h6>
+                    <h3>{{ $qtdEmprestimosAtrasados }}</h3>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 
@@ -44,6 +46,7 @@
             <div class="card-body">
                 <h5>Ações Rápidas</h5>
                 <div class="d-flex flex-wrap gap-2 mt-3">
+                    <a href="{{ route('parcelas.hoje') }}" class="btn btn-warning">Cobranças de Hoje</a>
                     <a href="{{ route('emprestimos.create') }}" class="btn btn-primary">Novo Empréstimo</a>
                     <a href="{{ route('clientes.index') }}" class="btn btn-outline-primary">Gerenciar Clientes</a>
                 </div>

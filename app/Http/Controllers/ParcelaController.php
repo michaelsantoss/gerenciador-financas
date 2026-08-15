@@ -5,9 +5,39 @@ namespace App\Http\Controllers;
 use App\Models\Parcela;
 use App\Models\Pagamento;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class ParcelaController extends Controller
 {
+    /**
+     * Lista as parcelas que vencem hoje e as que estão atrasadas.
+     */
+    public function hoje()
+    {
+        $hoje = Carbon::today();
+
+        $vencendoHoje = Parcela::whereDate('data_vencimento', $hoje)
+            ->whereIn('status', ['pendente', 'parcial'])
+            ->with('emprestimo.cliente')
+            ->get()
+            ->sortByDesc('valor_pendente')
+            ->values();
+
+        $atrasadas = Parcela::where(function ($query) use ($hoje) {
+                $query->where('status', 'atrasado')
+                    ->orWhere(function ($query) use ($hoje) {
+                        $query->whereIn('status', ['pendente', 'parcial'])
+                            ->whereDate('data_vencimento', '<', $hoje);
+                    });
+            })
+            ->with('emprestimo.cliente')
+            ->get()
+            ->sortBy('data_vencimento')
+            ->values();
+
+        return view('parcelas.hoje', compact('vencendoHoje', 'atrasadas'));
+    }
+
     /**
      * Quita uma parcela total ou parcialmente.
      */

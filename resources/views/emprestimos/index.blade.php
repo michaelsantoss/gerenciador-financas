@@ -12,6 +12,7 @@
                 <option value="atrasado" {{ request('status') == 'atrasado' ? 'selected' : '' }}>Atrasados</option>
             </select>
         </form>
+        <a href="{{ route('parcelas.hoje') }}" class="btn btn-warning">Cobranças de Hoje</a>
         <a href="{{ route('emprestimos.create') }}" class="btn btn-primary">Novo Empréstimo</a>
     </div>
 </div>

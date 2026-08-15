@@ -7,6 +7,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\PushSubscriptionController;
+use App\Http\Controllers\ParcelaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,7 @@ Route::middleware(['auth', 'empresa'])->group(function () {
     Route::resource('usuarios', UsuarioController::class);
     
     // Ações de Parcelas
+    Route::get('parcelas/hoje', [ParcelaController::class, 'hoje'])->name('parcelas.hoje');
     Route::post('parcelas/{parcela}/quitar', [EmprestimoWebController::class, 'quitarParcela'])->name('parcelas.quitar');
     Route::post('parcelas/{parcela}/desfazer', [EmprestimoWebController::class, 'desfazerParcela'])->name('parcelas.desfazer');
 
