@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Clientes</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <h1 class="mb-0">Clientes</h1>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCliente">
         Novo Cliente
     </button>

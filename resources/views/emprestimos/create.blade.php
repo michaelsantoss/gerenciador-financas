@@ -66,6 +66,7 @@
 
                     <div class="mb-3 d-none" id="grupo-parcelas">
                         <label class="form-label">Parcelas</label>
+                        <div class="table-responsive">
                         <table class="table table-sm align-middle">
                             <thead>
                                 <tr>
@@ -77,6 +78,7 @@
                             </thead>
                             <tbody id="tabela-parcelas"></tbody>
                         </table>
+                        </div>
                         <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-recalcular-parcelas">Recalcular parcelas</button>
                     </div>
 

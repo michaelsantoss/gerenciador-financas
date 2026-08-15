@@ -25,6 +25,25 @@
             filter: blur(6px);
             user-select: none;
         }
+
+        /* Ações de parcela (pagar/desfazer): lado a lado no desktop, empilhado no mobile */
+        .parcela-acao-form .parcela-acao-valor { width: 110px; }
+
+        @media (max-width: 576px) {
+            /* Alvo de toque maior em botões pequenos, sem afetar o desktop */
+            .btn-sm {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .parcela-acao-form {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+            .parcela-acao-form .parcela-acao-valor {
+                width: 100%;
+            }
+        }
     </style>
     <script>
         if (localStorage.getItem('privacidadeAtiva') === '1') {
@@ -87,7 +106,7 @@
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container-fluid container-md">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}

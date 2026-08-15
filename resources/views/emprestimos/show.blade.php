@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Detalhes do Empréstimo</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <h1 class="mb-0">Detalhes do Empréstimo</h1>
     <form action="{{ route('emprestimos.destroy', $emprestimo->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este empréstimo?')">
         @csrf
         @method('DELETE')
@@ -27,6 +27,7 @@
         <div class="card shadow-sm">
             <div class="card-header bg-white">Parcelas</div>
             <div class="card-body p-0">
+                <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
@@ -41,10 +42,10 @@
                         @foreach($emprestimo->parcelas as $parcela)
                         <tr class="{{ $parcela->status == 'pendente' && $parcela->data_vencimento->isPast() ? 'table-warning' : '' }}">
                             <td>#{{ $loop->iteration }}</td>
-                            <td class="{{ $parcela->status == 'pendente' && $parcela->data_vencimento->isPast() ? 'text-danger fw-bold' : '' }}">
+                            <td class="text-nowrap {{ $parcela->status == 'pendente' && $parcela->data_vencimento->isPast() ? 'text-danger fw-bold' : '' }}">
                                 {{ $parcela->data_vencimento->format('d/m/Y') }}
                             </td>
-                            <td class="dado-sensivel">
+                            <td class="dado-sensivel text-nowrap">
                                 R$ {{ number_format($parcela->valor, 2, ',', '.') }}
                                 @if($parcela->valor_pago > 0 && $parcela->status != 'pago')
                                     <br><small class="text-muted">Pago: R$ {{ number_format($parcela->valor_pago, 2, ',', '.') }} · Falta: R$ {{ number_format($parcela->valor_pendente, 2, ',', '.') }}</small>
@@ -55,12 +56,12 @@
                                     {{ ucfirst($parcela->status) }}
                                 </span>
                             </td>
-                            <td>
+                            <td style="min-width: 200px">
                                 @if($parcela->status != 'pago')
-                                <form action="{{ route('parcelas.quitar', $parcela->id) }}" method="POST" class="d-flex gap-1">
+                                <form action="{{ route('parcelas.quitar', $parcela->id) }}" method="POST" class="d-flex gap-1 parcela-acao-form">
                                     @csrf
-                                    <input type="number" name="valor" step="0.01" min="0.01" max="{{ $parcela->valor_pendente }}" value="{{ $parcela->valor_pendente }}" class="form-control form-control-sm" style="width: 110px" title="Valor a pagar">
-                                    <button type="submit" class="btn btn-sm btn-success">Registrar pagamento</button>
+                                    <input type="number" name="valor" step="0.01" min="0.01" max="{{ $parcela->valor_pendente }}" value="{{ $parcela->valor_pendente }}" class="form-control form-control-sm parcela-acao-valor" title="Valor a pagar">
+                                    <button type="submit" class="btn btn-sm btn-success text-nowrap">Registrar pagamento</button>
                                 </form>
                                 @else
                                 <form action="{{ route('parcelas.desfazer', $parcela->id) }}" method="POST" onsubmit="return confirm('Desfazer o último pagamento desta parcela?')">
@@ -83,6 +84,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     </div>

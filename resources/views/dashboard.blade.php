@@ -43,7 +43,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <h5>Ações Rápidas</h5>
-                <div class="d-flex gap-2 mt-3">
+                <div class="d-flex flex-wrap gap-2 mt-3">
                     <a href="{{ route('emprestimos.create') }}" class="btn btn-primary">Novo Empréstimo</a>
                     <a href="{{ route('clientes.index') }}" class="btn btn-outline-primary">Gerenciar Clientes</a>
                 </div>

@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Empréstimos</h1>
-    <div class="d-flex gap-2">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <h1 class="mb-0">Empréstimos</h1>
+    <div class="d-flex flex-wrap gap-2">
         <form action="{{ route('emprestimos.index') }}" method="GET" class="d-flex gap-2">
             <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
                 <option value="">Todos os Status</option>
@@ -45,12 +45,12 @@
                             </span>
                         </td>
                         <td>
-                            <div class="btn-group">
-                                <a href="{{ route('emprestimos.show', $emprestimo->id) }}" class="btn btn-sm btn-outline-secondary">Ver Detalhes</a>
+                            <div class="d-flex flex-column flex-sm-row gap-1">
+                                <a href="{{ route('emprestimos.show', $emprestimo->id) }}" class="btn btn-sm btn-outline-secondary text-nowrap">Ver Detalhes</a>
                                 <form action="{{ route('emprestimos.destroy', $emprestimo->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este empréstimo? Todos os pagamentos e parcelas vinculados serão removidos.')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">Excluir</button>
                                 </form>
                             </div>
                         </td>

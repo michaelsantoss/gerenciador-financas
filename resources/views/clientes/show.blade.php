@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Detalhes do Cliente: <span class="dado-sensivel">{{ $cliente->nome }}</span></h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <h1 class="mb-0">Detalhes do Cliente: <span class="dado-sensivel">{{ $cliente->nome }}</span></h1>
     <a href="{{ route('clientes.index') }}" class="btn btn-outline-secondary">Voltar</a>
 </div>
 
@@ -22,6 +22,7 @@
         <div class="card shadow-sm">
             <div class="card-header bg-white">Histórico de Empréstimos</div>
             <div class="card-body p-0">
+                <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
@@ -35,9 +36,9 @@
                     <tbody>
                         @forelse($cliente->emprestimos as $emprestimo)
                         <tr>
-                            <td>{{ $emprestimo->created_at->format('d/m/Y') }}</td>
-                            <td class="dado-sensivel">R$ {{ number_format($emprestimo->valor, 2, ',', '.') }}</td>
-                            <td class="dado-sensivel">R$ {{ number_format($emprestimo->saldo, 2, ',', '.') }}</td>
+                            <td class="text-nowrap">{{ $emprestimo->created_at->format('d/m/Y') }}</td>
+                            <td class="dado-sensivel text-nowrap">R$ {{ number_format($emprestimo->valor, 2, ',', '.') }}</td>
+                            <td class="dado-sensivel text-nowrap">R$ {{ number_format($emprestimo->saldo, 2, ',', '.') }}</td>
                             <td>
                                 <span class="badge bg-{{ $emprestimo->status == 'pago' ? 'success' : 'primary' }}">
                                     {{ ucfirst($emprestimo->status) }}
@@ -54,6 +55,7 @@
                         @endforelse
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     </div>
