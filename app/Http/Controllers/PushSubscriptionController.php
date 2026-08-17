@@ -22,4 +22,15 @@ class PushSubscriptionController extends Controller
 
         return response()->json(['status' => 'ok']);
     }
+
+    public function destroy(Request $request)
+    {
+        $dados = $request->validate([
+            'endpoint' => 'required|string',
+        ]);
+
+        $request->user()->deletePushSubscription($dados['endpoint']);
+
+        return response()->json(['status' => 'ok']);
+    }
 }

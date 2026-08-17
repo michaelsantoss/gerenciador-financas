@@ -52,6 +52,7 @@ Route::middleware(['auth', 'empresa'])->group(function () {
 
     // Notificações Push
     Route::post('push/subscribe', [PushSubscriptionController::class, 'store'])->name('push.subscribe');
+    Route::delete('push/unsubscribe', [PushSubscriptionController::class, 'destroy'])->name('push.unsubscribe');
 });
 
 // Painel do Dono do Software (super-admin, fora do contexto de empresa/tenant)

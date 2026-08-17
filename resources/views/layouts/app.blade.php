@@ -230,36 +230,73 @@
         });
 
         const btnAtivarNotificacoes = document.getElementById('btn-ativar-notificacoes');
-        if (btnAtivarNotificacoes) {
-            btnAtivarNotificacoes.addEventListener('click', async () => {
+        if (btnAtivarNotificacoes && 'serviceWorker' in navigator) {
+            async function atualizarEstadoNotificacoes() {
                 try {
-                    const permissao = await Notification.requestPermission();
-                    if (permissao !== 'granted') {
-                        alert('Permissão de notificação negada.');
-                        return;
-                    }
-
-                    const vapidPublicKey = document.querySelector('meta[name="vapid-public-key"]').content;
                     const registration = await navigator.serviceWorker.ready;
-                    const subscription = await registration.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-                    });
-
-                    await fetch('{{ route('push.subscribe') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        },
-                        body: JSON.stringify(subscription),
-                    });
-
-                    alert('Notificações ativadas!');
+                    const subscription = await registration.pushManager.getSubscription();
+                    const ativo = !!subscription;
+                    btnAtivarNotificacoes.textContent = ativo ? '🔔' : '🔕';
+                    btnAtivarNotificacoes.title = ativo ? 'Desativar notificações' : 'Ativar notificações';
+                    btnAtivarNotificacoes.dataset.ativo = ativo ? '1' : '0';
                 } catch (erro) {
                     console.error(erro);
-                    alert('Não foi possível ativar as notificações.');
                 }
+            }
+
+            atualizarEstadoNotificacoes();
+
+            btnAtivarNotificacoes.addEventListener('click', async () => {
+                try {
+                    if (btnAtivarNotificacoes.dataset.ativo === '1') {
+                        const registration = await navigator.serviceWorker.ready;
+                        const subscription = await registration.pushManager.getSubscription();
+
+                        if (subscription) {
+                            const endpoint = subscription.endpoint;
+                            await subscription.unsubscribe();
+                            await fetch('{{ route('push.unsubscribe') }}', {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                },
+                                body: JSON.stringify({ endpoint }),
+                            });
+                        }
+
+                        alert('Notificações desativadas.');
+                    } else {
+                        const permissao = await Notification.requestPermission();
+                        if (permissao !== 'granted') {
+                            alert('Permissão de notificação negada.');
+                            return;
+                        }
+
+                        const vapidPublicKey = document.querySelector('meta[name="vapid-public-key"]').content;
+                        const registration = await navigator.serviceWorker.ready;
+                        const subscription = await registration.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+                        });
+
+                        await fetch('{{ route('push.subscribe') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            },
+                            body: JSON.stringify(subscription),
+                        });
+
+                        alert('Notificações ativadas!');
+                    }
+                } catch (erro) {
+                    console.error(erro);
+                    alert('Não foi possível atualizar as notificações.');
+                }
+
+                atualizarEstadoNotificacoes();
             });
         }
     </script>
