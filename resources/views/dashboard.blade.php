@@ -1,7 +1,31 @@
 @extends('layouts.app')
 
 @section('content')
-<h1 class="mb-4">Dashboard: {{ Auth::user()->empresa->nome }}</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <h1 class="mb-0">Dashboard: {{ Auth::user()->empresa->nome }}</h1>
+    <form action="{{ route('dashboard') }}" method="GET" class="d-flex flex-wrap align-items-end gap-2">
+        <div>
+            <label class="form-label small mb-0">De</label>
+            <input type="date" name="inicio" value="{{ request('inicio') }}" class="form-control form-control-sm">
+        </div>
+        <div>
+            <label class="form-label small mb-0">Até</label>
+            <input type="date" name="fim" value="{{ request('fim') }}" class="form-control form-control-sm">
+        </div>
+        <button type="submit" class="btn btn-sm btn-primary">Filtrar</button>
+        @if(request('inicio') || request('fim'))
+            <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary">Limpar</a>
+        @endif
+    </form>
+</div>
+
+@if($inicio || $fim)
+    <p class="text-muted small">
+        Empréstimos concedidos e Lucro Previsto considerando o período selecionado
+        ({{ $inicio ? $inicio->format('d/m/Y') : 'início' }} até {{ $fim ? $fim->format('d/m/Y') : 'hoje' }}).
+        Total a Receber, Clientes Ativos e Empréstimos em Atraso continuam mostrando a situação atual (não são afetados pelo período).
+    </p>
+@endif
 
 <div class="row">
     <div class="col-md-3">
@@ -43,11 +67,11 @@
 <h5 class="mb-3">Rentabilidade</h5>
 <div class="row">
     <div class="col-md-4">
-        <div class="card bg-{{ $lucroRecebido >= 0 ? 'success' : 'danger' }} text-white shadow-sm mb-4">
+        <div class="card bg-success text-white shadow-sm mb-4">
             <div class="card-body">
                 <h6>Lucro Recebido</h6>
                 <h3 class="dado-sensivel">R$ {{ number_format($lucroRecebido, 2, ',', '.') }}</h3>
-                <small>Total recebido menos total emprestado</small>
+                <small>Parte de lucro (juros) já embutida no que foi efetivamente pago (R$ {{ number_format($totalRecebido, 2, ',', '.') }} recebidos)</small>
             </div>
         </div>
     </div>
@@ -56,7 +80,7 @@
             <div class="card-body">
                 <h6>Lucro Previsto</h6>
                 <h3 class="dado-sensivel">R$ {{ number_format($lucroPrevisto, 2, ',', '.') }}</h3>
-                <small>Juros embutidos em todos os contratos, se tudo for pago</small>
+                <small>Juros embutidos nos empréstimos do período, se tudo for pago</small>
             </div>
         </div>
     </div>
@@ -65,7 +89,7 @@
             <div class="card-body">
                 <h6>Margem de Lucro</h6>
                 <h3>{{ number_format($margemPercentual, 1, ',', '.') }}%</h3>
-                <small>Lucro previsto sobre o total emprestado</small>
+                <small>Lucro previsto sobre o total emprestado no período</small>
             </div>
         </div>
     </div>
