@@ -45,6 +45,30 @@ class EmprestimoWebController extends Controller
         return view('emprestimos.show', compact('emprestimo'));
     }
 
+    public function edit(Emprestimo $emprestimo)
+    {
+        $clientes = Cliente::all();
+        return view('emprestimos.edit', compact('emprestimo', 'clientes'));
+    }
+
+    public function update(Request $request, Emprestimo $emprestimo)
+    {
+        $request->merge([
+            'valor' => str_replace(',', '.', (string) $request->input('valor')),
+            'taxa_juros' => str_replace(',', '.', (string) $request->input('taxa_juros')),
+        ]);
+
+        $dados = $request->validate([
+            'cliente_id' => 'required|exists:clientes,id',
+            'valor' => 'required|numeric|min:0.01',
+            'taxa_juros' => 'nullable|numeric|min:0',
+        ]);
+
+        $emprestimo->update($dados);
+
+        return redirect()->route('emprestimos.show', $emprestimo->id)->with('success', 'Empréstimo atualizado com sucesso!');
+    }
+
     public function quitarParcela(Request $request, Parcela $parcela)
     {
         $resultado = app(ParcelaController::class)->quitar($request, $parcela);

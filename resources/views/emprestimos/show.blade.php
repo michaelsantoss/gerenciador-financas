@@ -6,11 +6,14 @@
         @include('partials.back-button', ['href' => route('emprestimos.index')])
         <h1 class="mb-0">Detalhes do Empréstimo</h1>
     </div>
-    <form action="{{ route('emprestimos.destroy', $emprestimo->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este empréstimo?')">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-danger">Excluir Empréstimo</button>
-    </form>
+    <div class="d-flex gap-2">
+        <a href="{{ route('emprestimos.edit', $emprestimo->id) }}" class="btn btn-outline-primary">Editar</a>
+        <form action="{{ route('emprestimos.destroy', $emprestimo->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este empréstimo?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">Excluir Empréstimo</button>
+        </form>
+    </div>
 </div>
 
 <div class="row mb-4">
