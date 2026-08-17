@@ -1,8 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+@php $filtroAtivo = request('inicio') || request('fim'); @endphp
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
     <h1 class="mb-0">Dashboard: {{ Auth::user()->empresa->nome }}</h1>
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#filtroPeriodo">
+        Filtrar por período {{ $filtroAtivo ? '(ativo)' : '' }}
+    </button>
+</div>
+
+<div class="collapse {{ $filtroAtivo ? 'show' : '' }} mb-4" id="filtroPeriodo">
     <form action="{{ route('dashboard') }}" method="GET" class="d-flex flex-wrap align-items-end gap-2">
         <div>
             <label class="form-label small mb-0">De</label>
@@ -13,7 +20,7 @@
             <input type="date" name="fim" value="{{ request('fim') }}" class="form-control form-control-sm">
         </div>
         <button type="submit" class="btn btn-sm btn-primary">Filtrar</button>
-        @if(request('inicio') || request('fim'))
+        @if($filtroAtivo)
             <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary">Limpar</a>
         @endif
     </form>
