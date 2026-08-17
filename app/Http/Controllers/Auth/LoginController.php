@@ -22,7 +22,12 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $request->remember)) {
             $user = Auth::user();
-            
+
+            if ($user->is_super_admin) {
+                $request->session()->regenerate();
+                return redirect()->intended(route('admin.empresas.index'));
+            }
+
             if (!$user->empresa_id) {
                 Auth::logout();
                 return back()->withErrors(['email' => 'Usuário sem empresa vinculada.']);

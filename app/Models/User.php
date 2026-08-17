@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'empresa_id',
         'role_id',
+        'is_super_admin',
     ];
 
     public function role()
@@ -58,5 +59,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_super_admin' => 'boolean',
     ];
 }

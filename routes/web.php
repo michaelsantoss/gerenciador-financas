@@ -8,6 +8,8 @@ use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\ParcelaController;
+use App\Http\Controllers\Admin\EmpresaController as AdminEmpresaController;
+use App\Http\Controllers\Admin\AtividadeController as AdminAtividadeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,4 +52,12 @@ Route::middleware(['auth', 'empresa'])->group(function () {
 
     // Notificações Push
     Route::post('push/subscribe', [PushSubscriptionController::class, 'store'])->name('push.subscribe');
+});
+
+// Painel do Dono do Software (super-admin, fora do contexto de empresa/tenant)
+Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('empresas', AdminEmpresaController::class)->except(['show']);
+    Route::post('empresas/{empresa}/desativar', [AdminEmpresaController::class, 'desativar'])->name('empresas.desativar');
+    Route::post('empresas/{empresa}/ativar', [AdminEmpresaController::class, 'ativar'])->name('empresas.ativar');
+    Route::get('logs', [AdminAtividadeController::class, 'index'])->name('logs.index');
 });
