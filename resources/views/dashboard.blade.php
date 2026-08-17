@@ -40,6 +40,37 @@
     </div>
 </div>
 
+<h5 class="mb-3">Rentabilidade</h5>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card bg-{{ $lucroRecebido >= 0 ? 'success' : 'danger' }} text-white shadow-sm mb-4">
+            <div class="card-body">
+                <h6>Lucro Recebido</h6>
+                <h3 class="dado-sensivel">R$ {{ number_format($lucroRecebido, 2, ',', '.') }}</h3>
+                <small>Total recebido menos total emprestado</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-primary text-white shadow-sm mb-4">
+            <div class="card-body">
+                <h6>Lucro Previsto</h6>
+                <h3 class="dado-sensivel">R$ {{ number_format($lucroPrevisto, 2, ',', '.') }}</h3>
+                <small>Juros embutidos em todos os contratos, se tudo for pago</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-dark text-white shadow-sm mb-4">
+            <div class="card-body">
+                <h6>Margem de Lucro</h6>
+                <h3>{{ number_format($margemPercentual, 1, ',', '.') }}%</h3>
+                <small>Lucro previsto sobre o total emprestado</small>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mt-4">
     <div class="col-md-12">
         <div class="card shadow-sm">
