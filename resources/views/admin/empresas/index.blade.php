@@ -22,6 +22,10 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        $statusCor = ['ativo' => 'success', 'inativo' => 'secondary', 'bloqueado' => 'danger'];
+                        $statusLabel = ['ativo' => 'Ativa', 'inativo' => 'Inativa', 'bloqueado' => 'Bloqueada'];
+                    @endphp
                     @foreach($empresas as $empresa)
                     <tr>
                         <td>{{ $empresa->nome }}</td>
@@ -30,20 +34,19 @@
                         <td>{{ $empresa->clientes_count }}</td>
                         <td>{{ $empresa->emprestimos_count }}</td>
                         <td>
-                            <span class="badge bg-{{ $empresa->ativo ? 'success' : 'secondary' }}">
-                                {{ $empresa->ativo ? 'Ativa' : 'Desativada' }}
+                            <span class="badge bg-{{ $statusCor[$empresa->status] ?? 'secondary' }}">
+                                {{ $statusLabel[$empresa->status] ?? ucfirst($empresa->status) }}
                             </span>
+                            @if($empresa->observacao)
+                                <br><small class="text-muted">{{ $empresa->observacao }}</small>
+                            @endif
                         </td>
                         <td>
                             <div class="d-flex flex-column flex-sm-row gap-1">
                                 <a href="{{ route('admin.empresas.edit', $empresa->id) }}" class="btn btn-sm btn-outline-primary text-nowrap">Editar</a>
+                                <a href="{{ route('admin.empresas.usuarios.index', $empresa->id) }}" class="btn btn-sm btn-outline-secondary text-nowrap">Usuários</a>
 
-                                @if($empresa->ativo)
-                                <form action="{{ route('admin.empresas.desativar', $empresa->id) }}" method="POST" onsubmit="return confirm('Desativar esta empresa? Os usuários dela não vão conseguir mais logar.')">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-secondary w-100">Desativar</button>
-                                </form>
-                                @else
+                                @if(!$empresa->estaAtiva())
                                 <form action="{{ route('admin.empresas.ativar', $empresa->id) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-outline-success w-100">Ativar</button>

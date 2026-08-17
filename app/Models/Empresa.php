@@ -9,11 +9,16 @@ class Empresa extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nome', 'cnpj', 'ativo'];
+    const STATUS_ATIVO = 'ativo';
+    const STATUS_INATIVO = 'inativo';
+    const STATUS_BLOQUEADO = 'bloqueado';
 
-    protected $casts = [
-        'ativo' => 'boolean',
-    ];
+    protected $fillable = ['nome', 'cnpj', 'status', 'observacao'];
+
+    public function estaAtiva()
+    {
+        return $this->status === self::STATUS_ATIVO;
+    }
 
     public function usuarios()
     {

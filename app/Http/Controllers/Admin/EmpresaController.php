@@ -69,28 +69,28 @@ class EmpresaController extends Controller
         $dados = $request->validate([
             'nome' => 'required|string|max:255',
             'cnpj' => 'nullable|string|max:20',
+            'status' => 'required|in:ativo,inativo,bloqueado',
+            'observacao' => 'nullable|string',
         ]);
 
+        $statusMudou = $empresa->status !== $dados['status'];
         $empresa->update($dados);
-        AdminActivityLog::registrar('empresa.editada', $empresa, "Empresa: {$empresa->nome}");
+
+        AdminActivityLog::registrar(
+            'empresa.editada',
+            $empresa,
+            "Empresa: {$empresa->nome}" . ($statusMudou ? " | Novo status: {$dados['status']}" : '')
+        );
 
         return redirect()->route('admin.empresas.index')->with('success', 'Empresa atualizada com sucesso!');
     }
 
     public function ativar(Empresa $empresa)
     {
-        $empresa->update(['ativo' => true]);
+        $empresa->update(['status' => Empresa::STATUS_ATIVO]);
         AdminActivityLog::registrar('empresa.ativada', $empresa, "Empresa: {$empresa->nome}");
 
         return back()->with('success', 'Empresa ativada com sucesso!');
-    }
-
-    public function desativar(Empresa $empresa)
-    {
-        $empresa->update(['ativo' => false]);
-        AdminActivityLog::registrar('empresa.desativada', $empresa, "Empresa: {$empresa->nome}");
-
-        return back()->with('success', 'Empresa desativada com sucesso!');
     }
 
     public function destroy(Empresa $empresa)

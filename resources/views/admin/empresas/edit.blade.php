@@ -22,6 +22,21 @@
                         <input type="text" name="cnpj" class="form-control @error('cnpj') is-invalid @enderror" value="{{ old('cnpj', $empresa->cnpj) }}">
                         @error('cnpj') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select @error('status') is-invalid @enderror" required>
+                            @foreach(['ativo' => 'Ativa', 'inativo' => 'Inativa', 'bloqueado' => 'Bloqueada'] as $valor => $label)
+                                <option value="{{ $valor }}" {{ old('status', $empresa->status) == $valor ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        <div class="form-text">Inativa/Bloqueada impedem login dos usuários dessa empresa.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observação</label>
+                        <textarea name="observacao" class="form-control @error('observacao') is-invalid @enderror" rows="3" placeholder="Motivo da inativação/bloqueio, ou qualquer anotação relevante">{{ old('observacao', $empresa->observacao) }}</textarea>
+                        @error('observacao') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
                     <button type="submit" class="btn btn-primary w-100">Salvar Alterações</button>
                 </form>
             </div>

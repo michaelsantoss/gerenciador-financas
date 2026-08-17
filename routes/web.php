@@ -4,12 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EmprestimoWebController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\ClienteArquivoController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\ParcelaController;
 use App\Http\Controllers\Admin\EmpresaController as AdminEmpresaController;
 use App\Http\Controllers\Admin\AtividadeController as AdminAtividadeController;
+use App\Http\Controllers\Admin\EmpresaUsuarioController as AdminEmpresaUsuarioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +41,9 @@ Route::middleware(['auth', 'empresa'])->group(function () {
     
     // Clientes
     Route::resource('clientes', ClienteController::class);
+    Route::post('clientes/{cliente}/arquivos', [ClienteArquivoController::class, 'store'])->name('clientes.arquivos.store');
+    Route::get('clientes/{cliente}/arquivos/{arquivo}', [ClienteArquivoController::class, 'show'])->name('clientes.arquivos.show');
+    Route::delete('clientes/{cliente}/arquivos/{arquivo}', [ClienteArquivoController::class, 'destroy'])->name('clientes.arquivos.destroy');
     
     // Configurações e Usuários
     Route::get('empresa', [EmpresaController::class, 'edit'])->name('empresa.edit');
@@ -58,7 +63,7 @@ Route::middleware(['auth', 'empresa'])->group(function () {
 // Painel do Dono do Software (super-admin, fora do contexto de empresa/tenant)
 Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('empresas', AdminEmpresaController::class)->except(['show']);
-    Route::post('empresas/{empresa}/desativar', [AdminEmpresaController::class, 'desativar'])->name('empresas.desativar');
     Route::post('empresas/{empresa}/ativar', [AdminEmpresaController::class, 'ativar'])->name('empresas.ativar');
+    Route::resource('empresas.usuarios', AdminEmpresaUsuarioController::class)->except(['show']);
     Route::get('logs', [AdminAtividadeController::class, 'index'])->name('logs.index');
 });

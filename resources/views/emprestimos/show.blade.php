@@ -43,9 +43,12 @@
                     </thead>
                     <tbody>
                         @foreach($emprestimo->parcelas as $parcela)
-                        <tr class="{{ $parcela->status == 'pendente' && $parcela->data_vencimento->isPast() ? 'table-warning' : '' }}">
+                        @php
+                            $parcelaAtrasada = $parcela->status == 'atrasado' || ($parcela->status == 'pendente' && $parcela->data_vencimento->isPast());
+                        @endphp
+                        <tr class="{{ $parcelaAtrasada ? 'table-danger' : '' }}">
                             <td>#{{ $loop->iteration }}</td>
-                            <td class="text-nowrap {{ $parcela->status == 'pendente' && $parcela->data_vencimento->isPast() ? 'text-danger fw-bold' : '' }}">
+                            <td class="text-nowrap {{ $parcelaAtrasada ? 'text-danger fw-bold' : '' }}">
                                 {{ $parcela->data_vencimento->format('d/m/Y') }}
                             </td>
                             <td class="dado-sensivel text-nowrap">
@@ -55,8 +58,8 @@
                                 @endif
                             </td>
                             <td>
-                                <span class="badge bg-{{ $parcela->status == 'pago' ? 'success' : ($parcela->status == 'parcial' ? 'info' : 'warning') }}">
-                                    {{ ucfirst($parcela->status) }}
+                                <span class="badge bg-{{ $parcela->status == 'pago' ? 'success' : ($parcela->status == 'parcial' ? 'info' : ($parcelaAtrasada ? 'danger' : 'warning')) }}">
+                                    {{ $parcelaAtrasada ? 'Atrasado' : ucfirst($parcela->status) }}
                                 </span>
                             </td>
                             <td style="min-width: 200px">
