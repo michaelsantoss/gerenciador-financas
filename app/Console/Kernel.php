@@ -15,7 +15,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('parcelas:notificar')->dailyAt('08:00');
+        // A cada 3h entre 8h e 22h (08:00, 11:00, 14:00, 17:00, 20:00)
+        $schedule->command('parcelas:notificar')->cron('0 8-22/3 * * *');
     }
 
     /**
