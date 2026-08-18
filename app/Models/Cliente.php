@@ -41,4 +41,26 @@ class Cliente extends Model
     {
         return $this->arquivos()->where('tipo', 'anexo');
     }
+
+    public function telefoneWhatsapp(): ?string
+    {
+        $digitos = preg_replace('/\D/', '', (string) $this->telefone);
+
+        if (strlen($digitos) < 10) {
+            return null;
+        }
+
+        if (!str_starts_with($digitos, '55')) {
+            $digitos = '55' . $digitos;
+        }
+
+        return $digitos;
+    }
+
+    public function linkWhatsapp(string $mensagem): ?string
+    {
+        $numero = $this->telefoneWhatsapp();
+
+        return $numero ? 'https://wa.me/' . $numero . '?text=' . urlencode($mensagem) : null;
+    }
 }
