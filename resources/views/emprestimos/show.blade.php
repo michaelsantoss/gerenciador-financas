@@ -26,7 +26,7 @@
                 <p><strong>Saldo Restante:</strong> <span class="dado-sensivel">R$ {{ number_format($emprestimo->saldo, 2, ',', '.') }}</span></p>
                 <p><strong>Status:</strong> <span class="badge bg-primary">{{ ucfirst($emprestimo->status) }}</span></p>
                 @if($emprestimo->saldo > 0)
-                    @include('partials.whatsapp-button', ['link' => $emprestimo->cliente->linkWhatsapp(\App\Support\MensagemCobranca::gerar('geral', $emprestimo->saldo)), 'label' => 'Cobrar pelo WhatsApp'])
+                    @include('partials.whatsapp-button', ['link' => $emprestimo->cliente->linkWhatsapp(\App\Support\MensagemCobranca::gerar('geral', $emprestimo->saldo, $emprestimo->cliente->nome)), 'label' => 'Cobrar pelo WhatsApp'])
                 @endif
             </div>
         </div>
