@@ -33,6 +33,7 @@ class EmpresaController extends Controller
         $dados = $request->validate([
             'nome' => 'required|string|max:255',
             'cnpj' => 'nullable|string|max:20',
+            'plano' => 'required|in:' . implode(',', array_keys(Empresa::PLANOS)),
             'usuario_nome' => 'required|string|max:255',
             'usuario_email' => 'required|email|unique:users,email',
             'usuario_senha' => 'required|min:6|confirmed',
@@ -43,6 +44,7 @@ class EmpresaController extends Controller
             $empresa = Empresa::create([
                 'nome' => $dados['nome'],
                 'cnpj' => $dados['cnpj'] ?? null,
+                'plano' => $dados['plano'],
             ]);
 
             User::create([
@@ -70,17 +72,25 @@ class EmpresaController extends Controller
             'nome' => 'required|string|max:255',
             'cnpj' => 'nullable|string|max:20',
             'status' => 'required|in:ativo,inativo,bloqueado',
+            'plano' => 'required|in:' . implode(',', array_keys(Empresa::PLANOS)),
             'observacao' => 'nullable|string',
         ]);
 
         $statusMudou = $empresa->status !== $dados['status'];
+        $planoAntigo = $empresa->plano;
+        $planoMudou = $planoAntigo !== $dados['plano'];
+
         $empresa->update($dados);
 
-        AdminActivityLog::registrar(
-            'empresa.editada',
-            $empresa,
-            "Empresa: {$empresa->nome}" . ($statusMudou ? " | Novo status: {$dados['status']}" : '')
-        );
+        $detalhes = "Empresa: {$empresa->nome}";
+        if ($statusMudou) {
+            $detalhes .= " | Novo status: {$dados['status']}";
+        }
+        if ($planoMudou) {
+            $detalhes .= " | Plano: {$planoAntigo} -> {$dados['plano']}";
+        }
+
+        AdminActivityLog::registrar('empresa.editada', $empresa, $detalhes);
 
         return redirect()->route('admin.empresas.index')->with('success', 'Empresa atualizada com sucesso!');
     }

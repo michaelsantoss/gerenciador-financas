@@ -14,6 +14,7 @@
                     <tr>
                         <th>Nome</th>
                         <th>CNPJ</th>
+                        <th>Plano</th>
                         <th>Usuários</th>
                         <th>Clientes</th>
                         <th>Empréstimos</th>
@@ -30,8 +31,14 @@
                     <tr>
                         <td>{{ $empresa->nome }}</td>
                         <td>{{ $empresa->cnpj ?? '—' }}</td>
-                        <td>{{ $empresa->usuarios_count }}</td>
-                        <td>{{ $empresa->clientes_count }}</td>
+                        <td>
+                            <span class="badge bg-info text-dark">{{ $empresa->nomePlano() }}</span>
+                            @if($empresa->atingiuLimiteClientes() || $empresa->atingiuLimiteAdmins())
+                                <br><small class="text-danger">Limite atingido</small>
+                            @endif
+                        </td>
+                        <td>{{ $empresa->usuarios_count }}{{ $empresa->limiteAdmins() ? '/' . $empresa->limiteAdmins() : '' }}</td>
+                        <td>{{ $empresa->clientes_count }}{{ $empresa->limiteClientes() ? '/' . $empresa->limiteClientes() : '' }}</td>
                         <td>{{ $empresa->emprestimos_count }}</td>
                         <td>
                             <span class="badge bg-{{ $statusCor[$empresa->status] ?? 'secondary' }}">

@@ -1,8 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+@php $empresaAtual = Auth::user()->empresa; @endphp
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-    <h1 class="mb-0">Usuários</h1>
+    <div>
+        <h1 class="mb-0">Usuários</h1>
+        @if($empresaAtual->limiteAdmins())
+            <small class="text-muted">{{ $usuarios->count() }} de {{ $empresaAtual->limiteAdmins() }} do plano {{ $empresaAtual->nomePlano() }}</small>
+        @endif
+    </div>
     <a href="{{ route('usuarios.create') }}" class="btn btn-primary">Novo Usuário</a>
 </div>
 

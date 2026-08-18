@@ -23,6 +23,21 @@
                         @error('cnpj') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Plano</label>
+                        <select name="plano" class="form-select @error('plano') is-invalid @enderror" required>
+                            @foreach(\App\Models\Empresa::PLANOS as $slug => $info)
+                                <option value="{{ $slug }}" {{ old('plano', $empresa->plano) == $slug ? 'selected' : '' }}>
+                                    {{ $info['label'] }} — R$ {{ number_format($info['preco'], 0, ',', '.') }}/mês
+                                    ({{ $info['max_clientes'] ?? 'ilimitado' }} clientes, {{ $info['max_admins'] ?? 'ilimitado' }} usuários)
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('plano') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        <div class="form-text">
+                            Uso atual: {{ $empresa->clientes()->count() }} cliente(s), {{ $empresa->usuarios()->count() }} usuário(s).
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Status</label>
                         <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                             @foreach(['ativo' => 'Ativa', 'inativo' => 'Inativa', 'bloqueado' => 'Bloqueada'] as $valor => $label)

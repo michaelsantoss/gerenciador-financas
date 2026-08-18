@@ -29,6 +29,12 @@ class EmpresaUsuarioController extends Controller
 
     public function store(Request $request, Empresa $empresa)
     {
+        if ($empresa->atingiuLimiteAdmins()) {
+            return back()->withInput()->withErrors(
+                "Limite de {$empresa->limiteAdmins()} usuário(s) do plano {$empresa->nomePlano()} atingido para esta empresa. Mude o plano dela antes de adicionar mais usuários."
+            );
+        }
+
         $dados = $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'email', Rule::unique('users')->where('empresa_id', $empresa->id)],

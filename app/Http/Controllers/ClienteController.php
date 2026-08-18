@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use App\Http\Requests\ClienteRequest;
+use Illuminate\Support\Facades\Auth;
 
 class ClienteController extends Controller
 {
@@ -15,6 +16,14 @@ class ClienteController extends Controller
 
     public function store(ClienteRequest $request)
     {
+        $empresa = Auth::user()->empresa;
+
+        if ($empresa->atingiuLimiteClientes()) {
+            return back()->withInput()->withErrors(
+                "Limite de {$empresa->limiteClientes()} clientes do plano {$empresa->nomePlano()} atingido. Fale com o suporte para fazer upgrade do plano."
+            );
+        }
+
         $dados = $request->validated();
         $enderecoDados = $dados['endereco'] ?? null;
         unset($dados['endereco']);

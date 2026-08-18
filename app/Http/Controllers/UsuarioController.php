@@ -24,6 +24,14 @@ class UsuarioController extends Controller
 
     public function store(Request $request)
     {
+        $empresa = Auth::user()->empresa;
+
+        if ($empresa->atingiuLimiteAdmins()) {
+            return back()->withInput()->withErrors(
+                "Limite de {$empresa->limiteAdmins()} usuário(s) do plano {$empresa->nomePlano()} atingido. Fale com o suporte para fazer upgrade do plano."
+            );
+        }
+
         $dados = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',

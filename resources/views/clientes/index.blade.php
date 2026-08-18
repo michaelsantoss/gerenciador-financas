@@ -1,8 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+@php $empresaAtual = Auth::user()->empresa; @endphp
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-    <h1 class="mb-0">Clientes</h1>
+    <div>
+        <h1 class="mb-0">Clientes</h1>
+        @if($empresaAtual->limiteClientes())
+            <small class="text-muted">{{ $clientes->count() }} de {{ $empresaAtual->limiteClientes() }} do plano {{ $empresaAtual->nomePlano() }}</small>
+        @endif
+    </div>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCliente">
         Novo Cliente
     </button>
