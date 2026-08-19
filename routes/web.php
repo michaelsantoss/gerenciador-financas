@@ -45,6 +45,7 @@ Route::middleware(['auth', 'empresa'])->group(function () {
     Route::delete('emprestimos/{emprestimo}', [EmprestimoWebController::class, 'destroy'])
         ->name('emprestimos.destroy')
         ->middleware('permission:emprestimos.excluir');
+    Route::post('emprestimos/{emprestimo}/renovar', [EmprestimoWebController::class, 'renovar'])->name('emprestimos.renovar');
     
     // Clientes
     Route::resource('clientes', ClienteController::class);

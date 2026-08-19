@@ -39,6 +39,62 @@ class EmprestimoService
     }
 
     /**
+     * Renova um empréstimo: cliente paga só o juros (valor principal x taxa)
+     * e o principal em aberto é reprogramado por um novo período, mantendo
+     * o mesmo empréstimo. Só permitido quando nenhuma parcela do ciclo
+     * atual foi paga ou parcialmente paga, para não corromper histórico de
+     * pagamentos já registrados.
+     */
+    public function renovar(Emprestimo $emprestimo): Emprestimo
+    {
+        return DB::transaction(function () use ($emprestimo) {
+            $emprestimo->loadMissing('parcelas');
+
+            if ($emprestimo->saldo <= 0) {
+                throw new \Exception('Este empréstimo já está quitado, não há o que renovar.');
+            }
+
+            if ($emprestimo->parcelas->contains(fn ($parcela) => $parcela->status !== 'pendente' && $parcela->status !== 'atrasado')) {
+                throw new \Exception('Só é possível renovar empréstimos sem parcelas pagas ou parcialmente pagas. Desfaça os pagamentos do ciclo atual antes de renovar.');
+            }
+
+            $quantidadeParcelas = max($emprestimo->parcelas->count(), 1);
+            $saldoAtual = $emprestimo->saldo;
+            $jurosRenovacao = round($emprestimo->valor * $emprestimo->taxa_juros / 100, 2);
+
+            $emprestimo->parcelas()->delete();
+
+            $emprestimo->update(['valor_total' => $emprestimo->valor_total + $jurosRenovacao]);
+
+            Pagamento::create([
+                'emprestimo_id' => $emprestimo->id,
+                'valor_pago' => $jurosRenovacao,
+                'data_pagamento' => now(),
+                'observacoes' => 'Renovação do empréstimo — pagamento de juros',
+            ]);
+
+            $hoje = Carbon::now();
+            $valorParcela = round($saldoAtual / $quantidadeParcelas, 2);
+
+            $novasEspecificacoes = collect(range(1, $quantidadeParcelas))->map(fn ($i) => [
+                'valor' => $valorParcela,
+                'data_vencimento' => $emprestimo->frequencia_pagamento === 'semanal'
+                    ? $hoje->copy()->addWeeks($i)
+                    : $hoje->copy()->addMonth(),
+                'pago' => false,
+                'data_pagamento' => null,
+            ])->all();
+
+            $this->gerarParcelas($emprestimo, $novasEspecificacoes);
+
+            $ultimaData = collect($novasEspecificacoes)->sortBy('data_vencimento')->last()['data_vencimento'];
+            $emprestimo->update(['data_vencimento' => $ultimaData, 'status' => 'ativo']);
+
+            return $emprestimo->refresh();
+        });
+    }
+
+    /**
      * Calcula o valor total com juros simples.
      */
     private function calcularJurosSimples(float $valor, float $taxa): float

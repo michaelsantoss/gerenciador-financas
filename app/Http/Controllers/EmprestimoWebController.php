@@ -91,6 +91,16 @@ class EmprestimoWebController extends Controller
         return back()->with('success', 'Pagamento desfeito com sucesso!');
     }
 
+    public function renovar(Emprestimo $emprestimo, EmprestimoService $service)
+    {
+        try {
+            $service->renovar($emprestimo);
+            return back()->with('success', 'Empréstimo renovado com sucesso!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
     public function destroy(Emprestimo $emprestimo)
     {
         $emprestimo->delete();

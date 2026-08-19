@@ -7,6 +7,16 @@
         <h1 class="mb-0">Detalhes do Empréstimo</h1>
     </div>
     <div class="d-flex gap-2">
+        @php
+            $podeRenovar = $emprestimo->saldo > 0 && !$emprestimo->parcelas->contains(fn ($p) => $p->status !== 'pendente' && $p->status !== 'atrasado');
+            $jurosRenovacao = round($emprestimo->valor * $emprestimo->taxa_juros / 100, 2);
+        @endphp
+        @if($podeRenovar)
+        <form action="{{ route('emprestimos.renovar', $emprestimo->id) }}" method="POST" onsubmit="return confirm('Renovar este empréstimo? O cliente paga R$ {{ number_format($jurosRenovacao, 2, ',', '.') }} de juros e o principal (R$ {{ number_format($emprestimo->saldo, 2, ',', '.') }}) é reprogramado para um novo período.')">
+            @csrf
+            <button type="submit" class="btn btn-outline-success">Renovar</button>
+        </form>
+        @endif
         <a href="{{ route('emprestimos.edit', $emprestimo->id) }}" class="btn btn-outline-primary">Editar</a>
         <form action="{{ route('emprestimos.destroy', $emprestimo->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este empréstimo?')">
             @csrf
