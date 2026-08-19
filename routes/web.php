@@ -32,7 +32,14 @@ Route::middleware(['auth', 'empresa'])->group(function () {
     
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index']);
-    
+
+    // Tutorial (guia de uso do sistema)
+    Route::get('/tutorial', function () {
+        return response()->file(resource_path('tutorial/guia-de-uso.html'), [
+            'Content-Type' => 'text/html; charset=UTF-8',
+        ]);
+    })->name('tutorial');
+
     // Empréstimos
     Route::resource('emprestimos', EmprestimoWebController::class)->except(['destroy']);
     Route::delete('emprestimos/{emprestimo}', [EmprestimoWebController::class, 'destroy'])
