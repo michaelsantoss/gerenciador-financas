@@ -38,6 +38,18 @@
                         </div>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Data de Vencimento</label>
+                        <input type="date" name="data_vencimento" class="form-control @error('data_vencimento') is-invalid @enderror" value="{{ old('data_vencimento', $empresa->data_vencimento->toDateString()) }}" required>
+                        @error('data_vencimento') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        <div class="form-text">
+                            @if($empresa->estaVencida())
+                                <span class="text-danger">Venceu há {{ abs($empresa->diasParaVencer()) }} dia(s).</span>
+                            @else
+                                Vence em {{ $empresa->diasParaVencer() }} dia(s).
+                            @endif
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Status</label>
                         <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                             @foreach(['ativo' => 'Ativa', 'inativo' => 'Inativa', 'bloqueado' => 'Bloqueada'] as $valor => $label)

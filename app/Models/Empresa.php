@@ -20,11 +20,31 @@ class Empresa extends Model
         'full' => ['label' => 'Full', 'preco' => 300, 'max_clientes' => null, 'max_admins' => null],
     ];
 
-    protected $fillable = ['nome', 'cnpj', 'status', 'observacao', 'plano'];
+    protected $fillable = ['nome', 'cnpj', 'status', 'observacao', 'plano', 'data_vencimento'];
+
+    protected $casts = [
+        'data_vencimento' => 'date',
+    ];
 
     public function estaAtiva()
     {
         return $this->status === self::STATUS_ATIVO;
+    }
+
+    public function diasParaVencer()
+    {
+        return (int) now()->startOfDay()->diffInDays($this->data_vencimento->copy()->startOfDay(), false);
+    }
+
+    public function venceEmBreve()
+    {
+        $dias = $this->diasParaVencer();
+        return $dias >= 0 && $dias <= 5;
+    }
+
+    public function estaVencida()
+    {
+        return $this->diasParaVencer() < 0;
     }
 
     public function nomePlano()

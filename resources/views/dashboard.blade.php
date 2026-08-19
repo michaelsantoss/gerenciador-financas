@@ -1,7 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
-@php $filtroAtivo = request('inicio') || request('fim'); @endphp
+@php
+    $filtroAtivo = request('inicio') || request('fim');
+    $empresaLogada = Auth::user()->empresa;
+    $diasParaVencer = $empresaLogada->diasParaVencer();
+@endphp
+
+@if($empresaLogada->estaVencida())
+    <div class="alert alert-danger">
+        <strong>Seu plano venceu em {{ $empresaLogada->data_vencimento->format('d/m/Y') }}.</strong>
+        Regularize o pagamento para evitar o bloqueio do acesso.
+    </div>
+@elseif($empresaLogada->venceEmBreve())
+    <div class="alert alert-warning">
+        <strong>Seu plano vence {{ $diasParaVencer == 0 ? 'hoje' : 'em ' . $diasParaVencer . ' dia(s)' }}</strong>
+        ({{ $empresaLogada->data_vencimento->format('d/m/Y') }}). Renove para evitar interrupção do acesso.
+    </div>
+@endif
+
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
     <h1 class="mb-0">Dashboard: {{ Auth::user()->empresa->nome }}</h1>
     <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#filtroPeriodo">

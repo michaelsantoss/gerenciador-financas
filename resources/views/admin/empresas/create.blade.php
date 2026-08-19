@@ -37,6 +37,11 @@
                         </select>
                         @error('plano') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data de Vencimento</label>
+                        <input type="date" name="data_vencimento" class="form-control @error('data_vencimento') is-invalid @enderror" value="{{ old('data_vencimento', now()->addDays(30)->toDateString()) }}" required>
+                        @error('data_vencimento') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
 
                     <hr class="my-4">
 

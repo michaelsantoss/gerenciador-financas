@@ -15,6 +15,7 @@
                         <th>Nome</th>
                         <th>CNPJ</th>
                         <th>Plano</th>
+                        <th>Vencimento</th>
                         <th>Usuários</th>
                         <th>Clientes</th>
                         <th>Empréstimos</th>
@@ -35,6 +36,14 @@
                             <span class="badge bg-info text-dark">{{ $empresa->nomePlano() }}</span>
                             @if($empresa->atingiuLimiteClientes() || $empresa->atingiuLimiteAdmins())
                                 <br><small class="text-danger">Limite atingido</small>
+                            @endif
+                        </td>
+                        <td class="text-nowrap">
+                            {{ $empresa->data_vencimento->format('d/m/Y') }}
+                            @if($empresa->estaVencida())
+                                <br><small class="text-danger">Venceu há {{ abs($empresa->diasParaVencer()) }}d</small>
+                            @elseif($empresa->venceEmBreve())
+                                <br><small class="text-warning">Vence em {{ $empresa->diasParaVencer() }}d</small>
                             @endif
                         </td>
                         <td>{{ $empresa->usuarios_count }}{{ $empresa->limiteAdmins() ? '/' . $empresa->limiteAdmins() : '' }}</td>

@@ -34,6 +34,7 @@ class EmpresaController extends Controller
             'nome' => 'required|string|max:255',
             'cnpj' => 'nullable|string|max:20',
             'plano' => 'required|in:' . implode(',', array_keys(Empresa::PLANOS)),
+            'data_vencimento' => 'required|date',
             'usuario_nome' => 'required|string|max:255',
             'usuario_email' => 'required|email|unique:users,email',
             'usuario_senha' => 'required|min:6|confirmed',
@@ -45,6 +46,7 @@ class EmpresaController extends Controller
                 'nome' => $dados['nome'],
                 'cnpj' => $dados['cnpj'] ?? null,
                 'plano' => $dados['plano'],
+                'data_vencimento' => $dados['data_vencimento'],
             ]);
 
             User::create([
@@ -73,12 +75,15 @@ class EmpresaController extends Controller
             'cnpj' => 'nullable|string|max:20',
             'status' => 'required|in:ativo,inativo,bloqueado',
             'plano' => 'required|in:' . implode(',', array_keys(Empresa::PLANOS)),
+            'data_vencimento' => 'required|date',
             'observacao' => 'nullable|string',
         ]);
 
         $statusMudou = $empresa->status !== $dados['status'];
         $planoAntigo = $empresa->plano;
         $planoMudou = $planoAntigo !== $dados['plano'];
+        $vencimentoAntigo = $empresa->data_vencimento->format('d/m/Y');
+        $vencimentoMudou = $vencimentoAntigo !== \Carbon\Carbon::parse($dados['data_vencimento'])->format('d/m/Y');
 
         $empresa->update($dados);
 
@@ -88,6 +93,9 @@ class EmpresaController extends Controller
         }
         if ($planoMudou) {
             $detalhes .= " | Plano: {$planoAntigo} -> {$dados['plano']}";
+        }
+        if ($vencimentoMudou) {
+            $detalhes .= " | Vencimento: {$vencimentoAntigo} -> {$empresa->data_vencimento->format('d/m/Y')}";
         }
 
         AdminActivityLog::registrar('empresa.editada', $empresa, $detalhes);

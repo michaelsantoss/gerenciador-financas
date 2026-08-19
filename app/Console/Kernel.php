@@ -17,6 +17,9 @@ class Kernel extends ConsoleKernel
     {
         // A cada 3h entre 8h e 22h (08:00, 11:00, 14:00, 17:00, 20:00)
         $schedule->command('parcelas:notificar')->cron('0 8-22/3 * * *');
+
+        // Todo dia de manhã, bloqueia empresas cujo plano venceu
+        $schedule->command('empresas:verificar-vencimento')->dailyAt('07:30');
     }
 
     /**
