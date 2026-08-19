@@ -40,7 +40,7 @@
                         <td>
                             <div class="d-flex flex-column flex-sm-row gap-1">
                                 <a href="{{ route('emprestimos.show', $parcela->emprestimo_id) }}" class="btn btn-sm btn-outline-secondary text-nowrap">Ver / Pagar</a>
-                                @include('partials.whatsapp-button', ['link' => $parcela->emprestimo->cliente->linkWhatsapp(\App\Support\MensagemCobranca::gerar('hoje', $parcela->valor_pendente, $parcela->emprestimo->cliente->nome))])
+                                @include('partials.whatsapp-button', ['link' => $parcela->emprestimo->cliente->linkWhatsapp(\App\Support\MensagemCobranca::gerar('hoje', $parcela->valor_pendente, $parcela->emprestimo->cliente->nome, $parcela->emprestimo->parcelas))])
                             </div>
                         </td>
                     </tr>
@@ -91,7 +91,7 @@
                         <td>
                             <div class="d-flex flex-column flex-sm-row gap-1">
                                 <a href="{{ route('emprestimos.show', $parcela->emprestimo_id) }}" class="btn btn-sm btn-outline-secondary text-nowrap">Ver / Pagar</a>
-                                @include('partials.whatsapp-button', ['link' => $parcela->emprestimo->cliente->linkWhatsapp(\App\Support\MensagemCobranca::gerar('atrasado', $parcela->valor_pendente, $parcela->emprestimo->cliente->nome))])
+                                @include('partials.whatsapp-button', ['link' => $parcela->emprestimo->cliente->linkWhatsapp(\App\Support\MensagemCobranca::gerar('atrasado', $parcela->valor_pendente, $parcela->emprestimo->cliente->nome, $parcela->emprestimo->parcelas))])
                             </div>
                         </td>
                     </tr>
