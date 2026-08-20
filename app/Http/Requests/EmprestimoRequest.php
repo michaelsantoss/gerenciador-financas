@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class EmprestimoRequest extends FormRequest
 {
@@ -26,7 +27,10 @@ class EmprestimoRequest extends FormRequest
     public function rules()
     {
         return [
-            'cliente_id' => 'required|exists:clientes,id',
+            'cliente_id' => [
+                'required',
+                Rule::exists('clientes', 'id')->where('empresa_id', $this->user()->empresa_id),
+            ],
             'valor' => 'required|numeric|min:0.01',
             'taxa_juros' => 'nullable|numeric|min:0',
             'frequencia_pagamento' => 'required|in:semanal,mensal',
