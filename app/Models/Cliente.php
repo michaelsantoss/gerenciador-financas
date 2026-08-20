@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Traits\BelongsToEmpresa;
 
 class Cliente extends Model
 {
-    use HasFactory, BelongsToEmpresa;
+    use HasFactory, BelongsToEmpresa, SoftDeletes;
 
     protected $table = 'clientes';
     protected $fillable = [

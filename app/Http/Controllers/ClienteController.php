@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
+use App\Models\AtividadeLog;
 use App\Http\Requests\ClienteRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,6 +34,8 @@ class ClienteController extends Controller
         if ($enderecoDados && array_filter($enderecoDados)) {
             $cliente->endereco()->create($enderecoDados);
         }
+
+        AtividadeLog::registrar('cliente.criado', $cliente, "Cliente \"{$cliente->nome}\" cadastrado");
 
         // Se a requisição vier da tela de empréstimo, volta para lá
         if (str_contains(url()->previous(), 'emprestimos/create')) {
@@ -66,6 +69,23 @@ class ClienteController extends Controller
             $cliente->endereco()->updateOrCreate([], $enderecoDados);
         }
 
+        AtividadeLog::registrar('cliente.editado', $cliente, "Cliente \"{$cliente->nome}\" atualizado");
+
         return redirect()->route('clientes.show', $cliente->id)->with('success', 'Cliente atualizado com sucesso!');
+    }
+
+    public function destroy(Cliente $cliente)
+    {
+        $temEmprestimoAberto = $cliente->emprestimos()->whereIn('status', ['ativo', 'atrasado'])->exists();
+
+        if ($temEmprestimoAberto) {
+            return back()->withErrors('Este cliente possui empréstimo(s) em aberto e não pode ser excluído.');
+        }
+
+        AtividadeLog::registrar('cliente.excluido', $cliente, "Cliente \"{$cliente->nome}\" excluído");
+
+        $cliente->delete();
+
+        return redirect()->route('clientes.index')->with('success', 'Cliente excluído com sucesso!');
     }
 }

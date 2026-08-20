@@ -6,7 +6,13 @@
         @include('partials.back-button', ['href' => route('clientes.index')])
         <h1 class="mb-0">Detalhes do Cliente: <span class="dado-sensivel">{{ $cliente->nome }}</span></h1>
     </div>
-    <a href="{{ route('clientes.edit', $cliente->id) }}" class="btn btn-outline-primary">Editar</a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('clientes.edit', $cliente->id) }}" class="btn btn-outline-primary">Editar</a>
+        <form action="{{ route('clientes.destroy', $cliente->id) }}" method="POST" onsubmit="return confirm('Excluir este cliente? Essa ação não pode ser desfeita.')">
+            @csrf @method('DELETE')
+            <button type="submit" class="btn btn-outline-danger">Excluir</button>
+        </form>
+    </div>
 </div>
 
 <div class="row">

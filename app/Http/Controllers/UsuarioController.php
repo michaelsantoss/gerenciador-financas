@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Role;
+use App\Models\AtividadeLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -39,13 +40,15 @@ class UsuarioController extends Controller
             'role_id' => 'required|exists:roles,id',
         ]);
 
-        User::create([
+        $usuario = User::create([
             'name' => $dados['name'],
             'email' => $dados['email'],
             'password' => Hash::make($dados['password']),
             'role_id' => $dados['role_id'],
             'empresa_id' => Auth::user()->empresa_id,
         ]);
+
+        AtividadeLog::registrar('usuario.criado', null, "Usuário \"{$usuario->name}\" cadastrado");
 
         return redirect()->route('usuarios.index')->with('success', 'Usuário criado!');
     }
@@ -70,6 +73,9 @@ class UsuarioController extends Controller
         }
 
         $usuario->update($dados);
+
+        AtividadeLog::registrar('usuario.editado', null, "Usuário \"{$usuario->name}\" atualizado");
+
         return redirect()->route('usuarios.index')->with('success', 'Usuário atualizado!');
     }
 
@@ -78,6 +84,9 @@ class UsuarioController extends Controller
         if ($usuario->id === Auth::id()) {
             return back()->withErrors('Você não pode excluir a si mesmo.');
         }
+
+        AtividadeLog::registrar('usuario.excluido', null, "Usuário \"{$usuario->name}\" removido");
+
         $usuario->delete();
         return back()->with('success', 'Usuário removido!');
     }

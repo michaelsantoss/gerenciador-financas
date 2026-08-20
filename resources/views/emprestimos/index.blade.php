@@ -6,10 +6,10 @@
     <div class="d-flex flex-wrap gap-2">
         <form action="{{ route('emprestimos.index') }}" method="GET" class="d-flex gap-2">
             <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                <option value="">Todos os Status</option>
-                <option value="ativo" {{ request('status') == 'ativo' ? 'selected' : '' }}>Ativos</option>
-                <option value="pago" {{ request('status') == 'pago' ? 'selected' : '' }}>Pagos</option>
-                <option value="atrasado" {{ request('status') == 'atrasado' ? 'selected' : '' }}>Atrasados</option>
+                <option value="" {{ $status === '' ? 'selected' : '' }}>Todos os Status</option>
+                <option value="ativo" {{ $status === 'ativo' ? 'selected' : '' }}>Ativos</option>
+                <option value="pago" {{ $status === 'pago' ? 'selected' : '' }}>Pagos</option>
+                <option value="atrasado" {{ $status === 'atrasado' ? 'selected' : '' }}>Atrasados</option>
             </select>
         </form>
         <a href="{{ route('parcelas.hoje') }}" class="btn btn-warning">Cobranças de Hoje</a>

@@ -9,6 +9,7 @@ use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\ParcelaController;
+use App\Http\Controllers\AtividadeController;
 use App\Http\Controllers\Admin\EmpresaController as AdminEmpresaController;
 use App\Http\Controllers\Admin\AtividadeController as AdminAtividadeController;
 use App\Http\Controllers\Admin\EmpresaUsuarioController as AdminEmpresaUsuarioController;
@@ -56,6 +57,8 @@ Route::middleware(['auth', 'empresa'])->group(function () {
     // Configurações e Usuários
     Route::get('empresa', [EmpresaController::class, 'edit'])->name('empresa.edit');
     Route::put('empresa', [EmpresaController::class, 'update'])->name('empresa.update');
+    Route::get('empresa/backup', [EmpresaController::class, 'backup'])->name('empresa.backup');
+    Route::get('atividades', [AtividadeController::class, 'index'])->name('atividades.index');
     Route::resource('usuarios', UsuarioController::class);
     
     // Ações de Parcelas

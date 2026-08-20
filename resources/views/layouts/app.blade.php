@@ -151,6 +151,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ route('empresa.edit') }}">Minha Empresa</a></li>
+                            <li><a class="dropdown-item {{ request()->routeIs('atividades.index') ? 'active' : '' }}" href="{{ route('atividades.index') }}">Log de Atividades</a></li>
                             <li><a class="dropdown-item" href="{{ route('tutorial') }}" target="_blank" rel="noopener">📘 Tutorial</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>

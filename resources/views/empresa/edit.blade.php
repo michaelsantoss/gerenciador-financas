@@ -24,6 +24,19 @@
                 </form>
             </div>
         </div>
+
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Backup dos Dados</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    Gera um arquivo .zip com um CSV de cada tabela (clientes, endereços, empréstimos, parcelas e pagamentos),
+                    com os IDs preservados para permitir reimportação futura. Fotos e anexos não são incluídos — apenas a lista com os nomes dos arquivos.
+                </p>
+                <a href="{{ route('empresa.backup') }}" class="btn btn-outline-secondary">Exportar Backup (.zip / CSV)</a>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

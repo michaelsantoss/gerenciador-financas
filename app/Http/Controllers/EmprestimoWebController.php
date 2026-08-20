@@ -5,22 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Emprestimo;
 use App\Models\Cliente;
 use App\Models\Parcela;
+use App\Models\AtividadeLog;
 use App\Http\Requests\EmprestimoRequest;
 use App\Services\EmprestimoService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EmprestimoWebController extends Controller
 {
     public function index(Request $request)
     {
+        $status = $request->has('status') ? $request->status : 'ativo';
+
         $query = Emprestimo::with('cliente');
 
-        if ($request->has('status') && $request->status !== null) {
-            $query->where('status', $request->status);
+        if ($status !== null && $status !== '') {
+            $query->where('status', $status);
         }
 
         $emprestimos = $query->orderBy('data_vencimento', 'asc')->get();
-        return view('emprestimos.index', compact('emprestimos'));
+        return view('emprestimos.index', compact('emprestimos', 'status'));
     }
 
     public function create()
@@ -32,7 +36,8 @@ class EmprestimoWebController extends Controller
     public function store(EmprestimoRequest $request, EmprestimoService $service)
     {
         try {
-            $service->criar($request->validated());
+            $emprestimo = $service->criar($request->validated());
+            AtividadeLog::registrar('emprestimo.criado', $emprestimo->cliente, "Empréstimo #{$emprestimo->id} criado para \"{$emprestimo->cliente->nome}\"");
             return redirect()->route('emprestimos.index')->with('success', 'Empréstimo criado com sucesso!');
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => 'Erro ao criar: ' . $e->getMessage()]);
@@ -59,12 +64,17 @@ class EmprestimoWebController extends Controller
         ]);
 
         $dados = $request->validate([
-            'cliente_id' => 'required|exists:clientes,id',
+            'cliente_id' => [
+                'required',
+                Rule::exists('clientes', 'id')->where('empresa_id', $request->user()->empresa_id),
+            ],
             'valor' => 'required|numeric|min:0.01',
             'taxa_juros' => 'nullable|numeric|min:0',
         ]);
 
         $emprestimo->update($dados);
+
+        AtividadeLog::registrar('emprestimo.editado', $emprestimo->cliente, "Empréstimo #{$emprestimo->id} atualizado");
 
         return redirect()->route('emprestimos.show', $emprestimo->id)->with('success', 'Empréstimo atualizado com sucesso!');
     }
@@ -77,6 +87,13 @@ class EmprestimoWebController extends Controller
             return back()->withErrors(['error' => $resultado->getData()->message]);
         }
 
+        $parcela->loadMissing('emprestimo.cliente');
+        AtividadeLog::registrar(
+            'parcela.quitada',
+            $parcela->emprestimo->cliente,
+            "Parcela #{$parcela->id} do empréstimo #{$parcela->emprestimo_id} " . ($resultado->status === 'pago' ? 'quitada' : 'paga parcialmente')
+        );
+
         return back()->with('success', $resultado->status === 'pago' ? 'Parcela quitada com sucesso!' : 'Pagamento parcial registrado com sucesso!');
     }
 
@@ -88,6 +105,9 @@ class EmprestimoWebController extends Controller
             return back()->withErrors(['error' => $resultado->getData()->message]);
         }
 
+        $parcela->loadMissing('emprestimo.cliente');
+        AtividadeLog::registrar('parcela.pagamento_desfeito', $parcela->emprestimo->cliente, "Pagamento da parcela #{$parcela->id} do empréstimo #{$parcela->emprestimo_id} desfeito");
+
         return back()->with('success', 'Pagamento desfeito com sucesso!');
     }
 
@@ -95,6 +115,7 @@ class EmprestimoWebController extends Controller
     {
         try {
             $service->renovar($emprestimo);
+            AtividadeLog::registrar('emprestimo.renovado', $emprestimo->cliente, "Empréstimo #{$emprestimo->id} renovado");
             return back()->with('success', 'Empréstimo renovado com sucesso!');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
@@ -103,6 +124,7 @@ class EmprestimoWebController extends Controller
 
     public function destroy(Emprestimo $emprestimo)
     {
+        AtividadeLog::registrar('emprestimo.excluido', $emprestimo->cliente, "Empréstimo #{$emprestimo->id} excluído");
         $emprestimo->delete();
         return redirect()->route('emprestimos.index')->with('success', 'Empréstimo excluído com sucesso!');
     }
