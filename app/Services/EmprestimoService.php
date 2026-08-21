@@ -95,6 +95,73 @@ class EmprestimoService
     }
 
     /**
+     * Atualiza as parcelas de um empréstimo (datas, valores, inclusão e
+     * remoção de parcelas). Parcelas já pagas ou parcialmente pagas nunca
+     * são alteradas ou removidas aqui, mesmo que venham no payload — só
+     * têm o histórico de pagamento preservado.
+     */
+    public function atualizarParcelas(Emprestimo $emprestimo, array $linhas): Emprestimo
+    {
+        return DB::transaction(function () use ($emprestimo, $linhas) {
+            $emprestimo->loadMissing('parcelas');
+            $parcelasExistentes = $emprestimo->parcelas->keyBy('id');
+            $idsProcessados = [];
+
+            foreach ($linhas as $linha) {
+                $id = $linha['id'] ?? null;
+                $parcela = $id ? $parcelasExistentes->get((int) $id) : null;
+
+                if ($parcela && !in_array($parcela->status, ['pendente', 'atrasado'])) {
+                    // Parcela já paga (total ou parcialmente): imutável.
+                    $idsProcessados[] = $parcela->id;
+                    continue;
+                }
+
+                if ($parcela && !empty($linha['remover'])) {
+                    $parcela->delete();
+                    continue;
+                }
+
+                if ($parcela) {
+                    $parcela->update([
+                        'valor' => round((float) $linha['valor'], 2),
+                        'data_vencimento' => Carbon::parse($linha['data_vencimento']),
+                    ]);
+                    $idsProcessados[] = $parcela->id;
+                    continue;
+                }
+
+                if (!empty($linha['remover'])) {
+                    continue;
+                }
+
+                $nova = Parcela::create([
+                    'emprestimo_id' => $emprestimo->id,
+                    'valor' => round((float) $linha['valor'], 2),
+                    'data_vencimento' => Carbon::parse($linha['data_vencimento']),
+                    'status' => 'pendente',
+                ]);
+                $idsProcessados[] = $nova->id;
+            }
+
+            $emprestimo->refresh()->loadMissing('parcelas');
+
+            if ($emprestimo->parcelas->isEmpty()) {
+                throw new \Exception('O empréstimo precisa ter ao menos uma parcela.');
+            }
+
+            $emprestimo->update([
+                'valor_total' => $emprestimo->parcelas->sum('valor'),
+                'data_vencimento' => $emprestimo->parcelas->max('data_vencimento'),
+            ]);
+
+            $emprestimo->atualizarStatus();
+
+            return $emprestimo->refresh();
+        });
+    }
+
+    /**
      * Calcula o valor total com juros simples.
      */
     private function calcularJurosSimples(float $valor, float $taxa): float

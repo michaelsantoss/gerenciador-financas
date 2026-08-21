@@ -52,15 +52,22 @@ class EmprestimoWebController extends Controller
 
     public function edit(Emprestimo $emprestimo)
     {
+        $emprestimo->load('parcelas');
         $clientes = Cliente::all();
         return view('emprestimos.edit', compact('emprestimo', 'clientes'));
     }
 
-    public function update(Request $request, Emprestimo $emprestimo)
+    public function update(Request $request, Emprestimo $emprestimo, EmprestimoService $service)
     {
+        $parcelas = collect($request->input('parcelas', []))->map(function ($parcela) {
+            $parcela['valor'] = str_replace(',', '.', $parcela['valor'] ?? '');
+            return $parcela;
+        })->all();
+
         $request->merge([
             'valor' => str_replace(',', '.', (string) $request->input('valor')),
             'taxa_juros' => str_replace(',', '.', (string) $request->input('taxa_juros')),
+            'parcelas' => $parcelas,
         ]);
 
         $dados = $request->validate([
@@ -70,9 +77,24 @@ class EmprestimoWebController extends Controller
             ],
             'valor' => 'required|numeric|min:0.01',
             'taxa_juros' => 'nullable|numeric|min:0',
+            'parcelas' => 'required|array|min:1',
+            'parcelas.*.id' => 'nullable|integer',
+            'parcelas.*.valor' => 'required|numeric|min:0.01',
+            'parcelas.*.data_vencimento' => 'required|date',
+            'parcelas.*.remover' => 'nullable|boolean',
         ]);
 
-        $emprestimo->update($dados);
+        $emprestimo->update([
+            'cliente_id' => $dados['cliente_id'],
+            'valor' => $dados['valor'],
+            'taxa_juros' => $dados['taxa_juros'] ?? $emprestimo->taxa_juros,
+        ]);
+
+        try {
+            $service->atualizarParcelas($emprestimo, $dados['parcelas']);
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => $e->getMessage()]);
+        }
 
         AtividadeLog::registrar('emprestimo.editado', $emprestimo->cliente, "Empréstimo #{$emprestimo->id} atualizado");
 
