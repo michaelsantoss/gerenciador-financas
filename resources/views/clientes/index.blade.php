@@ -14,6 +14,10 @@
     </button>
 </div>
 
+<div class="mb-3">
+    <input type="text" id="filtro-nome-cliente" class="form-control" placeholder="Filtrar por nome...">
+</div>
+
 <div class="card shadow-sm">
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -26,9 +30,9 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tabela-clientes">
                     @foreach($clientes as $cliente)
-                    <tr class="linha-clicavel" data-href="{{ route('clientes.show', $cliente->id) }}">
+                    <tr class="linha-clicavel" data-href="{{ route('clientes.show', $cliente->id) }}" data-nome="{{ strtolower($cliente->nome) }}">
                         <td class="dado-sensivel">{{ $cliente->nome }}</td>
                         <td class="dado-sensivel">{{ $cliente->telefone ?? 'Não informado' }}</td>
                         <td>{{ $cliente->emprestimos->where('status', 'ativo')->count() }}</td>
@@ -71,4 +75,13 @@
         </form>
     </div>
 </div>
+
+<script>
+document.getElementById('filtro-nome-cliente').addEventListener('input', function () {
+    const termo = this.value.trim().toLowerCase();
+    document.querySelectorAll('#tabela-clientes tr[data-nome]').forEach(function (linha) {
+        linha.classList.toggle('d-none', !linha.dataset.nome.includes(termo));
+    });
+});
+</script>
 @endsection

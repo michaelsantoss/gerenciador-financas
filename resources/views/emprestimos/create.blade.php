@@ -25,16 +25,17 @@
                     <div class="mb-3">
                         <label class="form-label">Cliente</label>
                         <div class="input-group">
-                            <select name="cliente_id" class="form-select @error('cliente_id') is-invalid @enderror">
-                                <option value="">Selecione um cliente</option>
-                                @foreach($clientes as $cliente)
-                                    <option value="{{ $cliente->id }}" {{ old('cliente_id') == $cliente->id ? 'selected' : '' }}>{{ $cliente->nome }}</option>
-                                @endforeach
-                            </select>
+                            <input type="text" id="cliente_nome" class="form-control @error('cliente_id') is-invalid @enderror" list="lista-clientes" autocomplete="off" placeholder="Digite o nome do cliente" value="{{ old('cliente_nome') }}">
                             <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#modalCliente">
                                 + Novo
                             </button>
                         </div>
+                        <datalist id="lista-clientes">
+                            @foreach($clientes as $cliente)
+                                <option value="{{ $cliente->nome }}"></option>
+                            @endforeach
+                        </datalist>
+                        <input type="hidden" name="cliente_id" id="cliente_id" value="{{ old('cliente_id') }}">
                         @error('cliente_id') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                     </div>
 
@@ -62,6 +63,11 @@
                         <div class="col-md-6 mb-3 d-none" id="grupo-numero-parcelas">
                             <label class="form-label">Número de Parcelas</label>
                             <input type="number" id="numero_parcelas" name="numero_parcelas" class="form-control" min="1" max="52" value="{{ old('numero_parcelas', 4) }}">
+                        </div>
+                        <div class="col-md-6 mb-3" id="grupo-vencimento-mensal">
+                            <label class="form-label">Vencimento</label>
+                            <input type="date" name="data_vencimento_mensal" id="data_vencimento_mensal" class="form-control @error('data_vencimento_mensal') is-invalid @enderror" value="{{ old('data_vencimento_mensal', now()->addDays(30)->format('Y-m-d')) }}">
+                            @error('data_vencimento_mensal') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
 
@@ -124,8 +130,22 @@
 
 <script>
 (function () {
+    const clientes = @json($clientes->map(fn ($c) => ['id' => $c->id, 'nome' => $c->nome]));
+    const clienteNomeInput = document.getElementById('cliente_nome');
+    const clienteIdInput = document.getElementById('cliente_id');
+
+    function sincronizarClienteId() {
+        const nomeDigitado = clienteNomeInput.value.trim().toLowerCase();
+        const encontrado = clientes.find(c => c.nome.toLowerCase() === nomeDigitado);
+        clienteIdInput.value = encontrado ? encontrado.id : '';
+    }
+
+    clienteNomeInput.addEventListener('input', sincronizarClienteId);
+    sincronizarClienteId();
+
     const frequencia = document.getElementById('frequencia_pagamento');
     const grupoNumeroParcelas = document.getElementById('grupo-numero-parcelas');
+    const grupoVencimentoMensal = document.getElementById('grupo-vencimento-mensal');
     const grupoParcelas = document.getElementById('grupo-parcelas');
     const numeroParcelas = document.getElementById('numero_parcelas');
     const valorInput = document.querySelector('input[name="valor"]');
@@ -170,6 +190,7 @@
         const semanal = frequencia.value === 'semanal';
         grupoNumeroParcelas.classList.toggle('d-none', !semanal);
         grupoParcelas.classList.toggle('d-none', !semanal);
+        grupoVencimentoMensal.classList.toggle('d-none', semanal);
         if (semanal) {
             gerarLinhas();
         } else {
@@ -183,6 +204,7 @@
     if (frequencia.value === 'semanal') {
         grupoNumeroParcelas.classList.remove('d-none');
         grupoParcelas.classList.remove('d-none');
+        grupoVencimentoMensal.classList.add('d-none');
         gerarLinhas();
     }
 })();

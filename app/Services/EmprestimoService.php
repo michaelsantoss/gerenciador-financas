@@ -126,12 +126,15 @@ class EmprestimoService
         $valorTotal = round($this->calcularJurosSimples($valorPrincipal, $taxa), 2);
         $valorParcela = round($valorTotal / $quantidade, 2);
         $hoje = Carbon::now();
+        $vencimentoMensal = !empty($dados['data_vencimento_mensal'])
+            ? Carbon::parse($dados['data_vencimento_mensal'])
+            : $hoje->copy()->addDays(30);
 
         return collect(range(1, $quantidade))->map(fn ($i) => [
             'valor' => $valorParcela,
             'data_vencimento' => $frequencia === 'semanal'
                 ? $hoje->copy()->addWeeks($i)
-                : $hoje->copy()->addMonth(),
+                : $vencimentoMensal,
             'pago' => false,
             'data_pagamento' => null,
         ])->all();

@@ -8,6 +8,10 @@
                 <h4 class="mb-0">Acesso ao Sistema</h4>
             </div>
             <div class="card-body p-4">
+                @if (session('error'))
+                    <div class="alert alert-warning">{{ session('error') }}</div>
+                @endif
+
                 @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul class="mb-0">

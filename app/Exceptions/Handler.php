@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Session\TokenMismatchException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -46,5 +47,18 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    /**
+     * Sessão expirada (CSRF token inválido) redireciona para o login
+     * em vez de mostrar a página de erro 419.
+     */
+    public function render($request, Throwable $e)
+    {
+        if ($e instanceof TokenMismatchException) {
+            return redirect()->route('login')->with('error', 'Sua sessão expirou. Faça login novamente.');
+        }
+
+        return parent::render($request, $e);
     }
 }

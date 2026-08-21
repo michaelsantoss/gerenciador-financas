@@ -17,6 +17,10 @@
     </div>
 </div>
 
+<div class="mb-3">
+    <input type="text" id="filtro-nome-emprestimo" class="form-control" placeholder="Filtrar por nome do cliente...">
+</div>
+
 <div class="card shadow-sm">
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -31,9 +35,9 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tabela-emprestimos">
                     @foreach($emprestimos as $emprestimo)
-                    <tr class="linha-clicavel {{ $emprestimo->status == 'atrasado' ? 'table-danger' : '' }}" data-href="{{ route('emprestimos.show', $emprestimo->id) }}">
+                    <tr class="linha-clicavel {{ $emprestimo->status == 'atrasado' ? 'table-danger' : '' }}" data-href="{{ route('emprestimos.show', $emprestimo->id) }}" data-nome="{{ strtolower($emprestimo->cliente->nome) }}">
                         <td class="dado-sensivel">{{ $emprestimo->cliente->nome }}</td>
                         <td class="dado-sensivel">R$ {{ number_format($emprestimo->valor, 2, ',', '.') }}</td>
                         <td class="dado-sensivel">R$ {{ number_format($emprestimo->valor_total, 2, ',', '.') }}</td>
@@ -62,4 +66,13 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('filtro-nome-emprestimo').addEventListener('input', function () {
+    const termo = this.value.trim().toLowerCase();
+    document.querySelectorAll('#tabela-emprestimos tr[data-nome]').forEach(function (linha) {
+        linha.classList.toggle('d-none', !linha.dataset.nome.includes(termo));
+    });
+});
+</script>
 @endsection

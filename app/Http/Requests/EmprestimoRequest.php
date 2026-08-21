@@ -35,6 +35,7 @@ class EmprestimoRequest extends FormRequest
             'taxa_juros' => 'nullable|numeric|min:0',
             'frequencia_pagamento' => 'required|in:semanal,mensal',
             'numero_parcelas' => 'required_if:frequencia_pagamento,semanal|integer|min:1|max:52',
+            'data_vencimento_mensal' => 'required_if:frequencia_pagamento,mensal|date',
             'parcelas' => 'nullable|array',
             'parcelas.*.valor' => 'required_with:parcelas|numeric|min:0.01',
             'parcelas.*.data_vencimento' => 'required_with:parcelas|date',
