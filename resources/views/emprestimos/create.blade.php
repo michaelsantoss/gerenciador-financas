@@ -25,16 +25,14 @@
                     <div class="mb-3">
                         <label class="form-label">Cliente</label>
                         <div class="input-group">
-                            <input type="text" id="cliente_nome" class="form-control @error('cliente_id') is-invalid @enderror" list="lista-clientes" autocomplete="off" placeholder="Digite o nome do cliente" value="{{ old('cliente_nome') }}">
+                            <div class="combobox-cliente position-relative flex-grow-1">
+                                <input type="text" id="cliente_busca" class="form-control @error('cliente_id') is-invalid @enderror" autocomplete="off" placeholder="Digite para buscar um cliente">
+                                <ul class="list-group position-absolute w-100 shadow-sm d-none" id="cliente_opcoes" style="z-index: 1000; max-height: 240px; overflow-y: auto;"></ul>
+                            </div>
                             <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#modalCliente">
                                 + Novo
                             </button>
                         </div>
-                        <datalist id="lista-clientes">
-                            @foreach($clientes as $cliente)
-                                <option value="{{ $cliente->nome }}"></option>
-                            @endforeach
-                        </datalist>
                         <input type="hidden" name="cliente_id" id="cliente_id" value="{{ old('cliente_id') }}">
                         @error('cliente_id') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                     </div>
@@ -131,17 +129,77 @@
 <script>
 (function () {
     const clientes = @json($clientes->map(fn ($c) => ['id' => $c->id, 'nome' => $c->nome]));
-    const clienteNomeInput = document.getElementById('cliente_nome');
+    const clienteIdAntigo = @json(old('cliente_id'));
+
+    const buscaInput = document.getElementById('cliente_busca');
+    const opcoesLista = document.getElementById('cliente_opcoes');
     const clienteIdInput = document.getElementById('cliente_id');
 
-    function sincronizarClienteId() {
-        const nomeDigitado = clienteNomeInput.value.trim().toLowerCase();
-        const encontrado = clientes.find(c => c.nome.toLowerCase() === nomeDigitado);
-        clienteIdInput.value = encontrado ? encontrado.id : '';
+    function fecharOpcoes() {
+        opcoesLista.classList.add('d-none');
+        opcoesLista.innerHTML = '';
     }
 
-    clienteNomeInput.addEventListener('input', sincronizarClienteId);
-    sincronizarClienteId();
+    function selecionarCliente(cliente) {
+        clienteIdInput.value = cliente.id;
+        buscaInput.value = cliente.nome;
+        buscaInput.classList.remove('is-invalid');
+        fecharOpcoes();
+    }
+
+    function renderizarOpcoes(termo) {
+        const termoNormalizado = termo.trim().toLowerCase();
+        const encontrados = termoNormalizado
+            ? clientes.filter(c => c.nome.toLowerCase().includes(termoNormalizado))
+            : clientes;
+
+        opcoesLista.innerHTML = '';
+
+        if (!encontrados.length) {
+            opcoesLista.classList.add('d-none');
+            return;
+        }
+
+        encontrados.slice(0, 50).forEach(function (cliente) {
+            const item = document.createElement('li');
+            item.className = 'list-group-item list-group-item-action';
+            item.style.cursor = 'pointer';
+            item.textContent = cliente.nome;
+            item.addEventListener('mousedown', function (event) {
+                event.preventDefault();
+                selecionarCliente(cliente);
+            });
+            opcoesLista.appendChild(item);
+        });
+
+        opcoesLista.classList.remove('d-none');
+    }
+
+    buscaInput.addEventListener('input', function () {
+        clienteIdInput.value = '';
+        renderizarOpcoes(buscaInput.value);
+    });
+
+    buscaInput.addEventListener('focus', function () {
+        renderizarOpcoes(buscaInput.value);
+    });
+
+    buscaInput.addEventListener('blur', function () {
+        setTimeout(function () {
+            if (!clienteIdInput.value) {
+                buscaInput.value = '';
+            }
+            fecharOpcoes();
+        }, 100);
+    });
+
+    if (clienteIdAntigo) {
+        const clienteSelecionado = clientes.find(c => String(c.id) === String(clienteIdAntigo));
+        if (clienteSelecionado) {
+            buscaInput.value = clienteSelecionado.nome;
+            clienteIdInput.value = clienteSelecionado.id;
+        }
+    }
 
     const frequencia = document.getElementById('frequencia_pagamento');
     const grupoNumeroParcelas = document.getElementById('grupo-numero-parcelas');
